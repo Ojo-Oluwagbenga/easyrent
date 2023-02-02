@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+// Had to configure the controller namespace at app/Providers/RouteServiceProvider.php
 Route::get('/api/test', 'ApiController@test');
 Route::get('', 'ApiController@welcome');
 
