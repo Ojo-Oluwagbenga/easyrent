@@ -52,4 +52,10 @@ class ApiController extends Controller
         ];
         return json_encode($ret);      
     } 
+    public function welcome(Request $request){
+        $ret = [
+            'test' =>'welcome succesful'
+        ];
+        return json_encode($ret);      
+    } 
 }
