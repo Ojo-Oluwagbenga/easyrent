@@ -1,0 +1,101 @@
+API DOCS AND IMPLEMENTATION
+
+
+Always use the request_token in the header's X-CSRF-TOKEN for all POST request.
+
+<Request Token>
+    axios({
+        ...
+        url: '.../fetchtoken/{accesstoken}',
+        method: 'GET',
+        ...
+    ))
+
+    Example Success:
+    {
+        status:200,
+        "request_token":"e0wgtea3uzOBC7PPBBt5CiAcstS4TKdWOipZJC0h"
+    }
+</Request Token>
+
+
+
+<User Create>
+    axios({
+        ...
+        url: ".../apis/user/create",
+        method: 'POST',
+        headers: {
+            "X-CSRF-TOKEN" : request_token
+        },
+        data:{
+            name:"val"
+            email:"email"
+            password:"password"
+            gender:"m/f"
+        }
+        ...
+    ))
+</User Create>
+
+<User Validate>
+    axios({
+        ...
+        url: ".../apis/user/validate",
+        method: 'POST',
+        headers: {
+            "X-CSRF-TOKEN" : request_token
+        },
+        data:{
+            email:"email"
+            password:"password"
+        }
+        ...
+    ))
+</User Validate>
+
+<User Fetch>
+    axios({
+        ...
+        url: ".../apis/user/fetch",
+        method: 'POST',
+        headers: {
+            "X-CSRF-TOKEN" : request_token
+        },
+        data:{
+            fetchset:['name', 'email' ...]
+            querypair:[
+                [column_name, column_value],
+                ["size", "14"],
+                ["price", "<1000"]
+                ...
+            ]
+        }
+        ...
+    ))
+</User Fetch>
+
+<User Update>
+    axios({
+        ...
+        url: ".../apis/user/update",
+        method: 'POST',
+        headers: {
+            "X-CSRF-TOKEN" : request_token
+        },
+        data:{
+            updset:{
+                'name':"New Name", 
+                'email' "New Mail"
+                ...
+            }
+            updpair:[
+                [column_name, column_value],
+                ["size", "14"],
+                ["price", "<1000"]
+                ...
+            ]
+        }
+        ...
+    ))
+</User Update>

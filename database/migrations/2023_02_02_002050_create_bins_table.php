@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('bins', function (Blueprint $table) {
             $table->id();
             $table->string('ownerid');
+            $table->string('code');
             $table->timestamps();
             $table->string('name');
             $table->text('description');
