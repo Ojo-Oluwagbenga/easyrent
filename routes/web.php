@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/api/test', 'ApiController@test');
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::post('/api/{class_name}/{func_name}', 'ApiController@manager');
