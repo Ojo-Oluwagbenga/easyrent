@@ -11,10 +11,11 @@ use App\Models\User as ModelUser;
 class ApiController extends Controller
 {
     public function manager(Request $request, $class_name, $func_name){
+        
         $managedclasses = [
             'User' => (new User),
             // 'Bin' => (new Bin),
-            // 'Product' => (new Product),
+            'Product' => (new Product),
         ];
        
         try{           
@@ -78,7 +79,12 @@ class ApiController extends Controller
             'test' =>csrf_token()
         ];
         return json_encode($ret);      
+    }
+    public function pagetest(Request $request){
+        return view('test');      
     } 
+
+
     public function fetchtoken(Request $request, $apiaccesstoken){
         $ret = [
             'status'=>201,
@@ -114,7 +120,7 @@ class User{
     public function create($request){
         $data = $request->all();       
         $data['code'] = '-';       
-        $data['likedproducts'] = '-';       
+        $data['likedproducts'] = '[]';       
         $data['role'] = 'm';
 
         $validator = Validator::make($data, [
@@ -201,24 +207,23 @@ class User{
         $data = $request->all();
 
         $updset = ($data['updset']);
-        $updpair = ($data['updpair']);
+        $querypair = ($data['querypair']);
 
         unset($updset['code']);
-        unset($updset['email']);
-        unset($updset['gender']);
+        unset($updset['email']);// Another code to 
 
         
-        $updvaller = [];
+        $updvalidator = [];
 
         foreach($updset as $key => $val){
             if (isset($this->valset[$key])){
-                $updvaller[$key] = $this->valset[$key];
+                $updvalidator[$key] = $this->valset[$key];
             }else{
                 unset($updset[$key]);
             }
         }
 
-        $validator = Validator::make($updset, $updvaller);
+        $validator = Validator::make($updset, $updvalidator);
         if ($validator->fails()) {
             $ret = [
                 'status' => '201',
@@ -229,7 +234,7 @@ class User{
         }
         
         try{
-            $user = ModelUser::where($updpair[0] , $updpair[1])->get(['code']);
+            $user = ModelUser::where($querypair)->get(['code']);
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
                 'status' => '201',
@@ -244,13 +249,12 @@ class User{
         if (count($user) === 0){
             $ret = [
                 'status' => '201',
-                'reason' => 'valerrorpop',
                 'data' => 'User not found',
             ];
             return json_encode($ret);
         }
 
-        $user = ModelUser::where([$updpair[0] => $updpair[1]])->first();
+        $user = ModelUser::where($querypair)->first();
 
         
         foreach($updset as $key => $val){
@@ -271,31 +275,43 @@ class User{
         $ret = [
             'response' => 'passed',
             'data' => [
-                'user' =>   $user->code
+                'user' => $user->code
             ],
         ];
         return json_encode($ret);
         
     }
 
+    private function cleanArray($arr, $remove){
+
+        $ret = [];
+        $arr = array_diff($arr, $remove);
+        foreach ($arr as $vals) {
+            array_push($ret, $vals);
+        }
+        return ($ret);
+    }
+
+
     public function fetch($request){
         $data = $request->all();
 
         $fetchset =  $data['fetchset'];
         $querypair =  $data['querypair'];
-        
+
+        $fetchset = $this->cleanArray($fetchset, ['id', 'password']);
+
         try{
             $model = ModelUser::select($fetchset)->where($querypair)->get();
             $ret = [
                 'response' => '200',
-                'data' => json_encode($model),
+                'data' => $model,
             ];
             return json_encode($ret);
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
                 'response' => '201',
-                'reason' => $ex->getMessage(),
-                'data' => '',
+                'data' => 'Invalid query',
             ];
             return json_encode($ret);
         }
@@ -305,6 +321,7 @@ class User{
     public function validate($request){
         $data = $request->all();
 
+        
         $validator = Validator::make($data, [
             'email' => ['required'],
             'password' => ['required'],
@@ -318,20 +335,26 @@ class User{
             ];
             return json_encode($ret); 
         }        
-
-        
+               
         
         try{
-            $user = ModelUser::select(['code', 'name'])->where([
-                                                ['email', $data['email']], 
-                                                ['password', $data['password']] 
-            ]);
+            $user = ModelUser::where([
+                    ['email', $data['email']], 
+                    ['password', $data['password']] 
+            ])->get(['code', 'name']);
+
+            if (isset($user[0])){
+                $user = $user[0];
+            }else{
+                $user = null;
+            }
+            
 
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
                 'status' => '201',
                 'reason' => $ex->getMessage(),
-                'data' => '',
+                'data' => 'here',
             ];
             return json_encode($ret);
         }
@@ -345,6 +368,7 @@ class User{
             return json_encode($ret);
         }
 
+
         $ret = [
             'response' => 'passed',
             'data' => [
@@ -356,6 +380,301 @@ class User{
         
     }
     
+    
+    
+}
+
+class Product{
+
+
+    private $valset =  [
+        'name' => ['required', 'min:4', 'max:35', 'string'],
+        'price' => ['required', 'numeric', 'min:0'],
+        'description' => ['required', 'min:5'],
+        'code' => ['required'],
+        'type' => ['required'],
+        'category' => ['required'],
+        'imagepaths' => ['required'],
+    ];
+    
+
+    public function create($request){
+        
+        $datapack = $request->all();
+
+
+        $data = (array) json_decode($datapack['createset']);   
+        $data['code'] = '-';
+        $data['imagepaths'] = '[]';
+
+        //Other data check
+        $validator = Validator::make($data, $this->valset);
+        if ($validator->fails()) {
+            $ret = [
+                'status' => 201,
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return json_encode($ret);
+        }        
+
+        // File Check
+        $updcount = $datapack['number_of_images'];
+        $fileValidator = [];
+        for ($i=0; $i < $updcount ; $i++) { 
+            $fileValidator['file-' . ($i + 1)] = 'nullable|image|mimes:jpeg,jpg,png,gif';
+        }
+        $validator = Validator::make($datapack, $fileValidator);
+        if ($validator->fails()) {
+            $ret = [
+                'status' => 201,
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return json_encode($ret);
+        }
+
+        
+
+        $model = new ModelProduct;
+        $upldir = ""; // Upload directory
+
+        foreach($data as $key => $val){
+            $model->$key = $val;
+        }
+
+        try{
+            $model->save();
+            $mid = $model->id;
+            try {
+                for ($i=0; $i < $updcount; $i++) {
+                    $file = $request->file('file-'. ($i+1));
+                    if($file) {
+                        // File extension
+                        $extension = $file->getClientOriginalExtension();
+
+                        $filename = "upload" . "-" . ($i+1) . "." . $extension;      
+
+                        // File upload location
+                        $upldir = 'uploadedfiles/productfiles/product_' . Util::Encode($mid, 4, 'str');
+            
+                        // Upload file
+                        $file->move($upldir, $filename);
+                        
+                    }else{
+                        // Response
+                        $ret = [
+                            'response' => 'failed',
+                            'reason' => 'file-'. ($i+1) . ' not uploaded.',
+                            'data' => '',
+                        ];
+                        return json_encode($ret);
+                    }
+                }      
+            } catch(\Illuminate\Database\QueryException $ex){ 
+                $ret = [
+                    'status' => '201',
+                    'reason' => $ex->getMessage(),
+                    'data' => '',
+                ];
+                return json_encode($ret);
+            }
+
+
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'status' => '201',
+                'reason' => $ex->getMessage(),
+                'data' => '',
+            ];
+            return json_encode($ret);
+        }
+        
+        $ret = [
+            'status' => '200',
+            'data' => [
+                'product_code' =>  $model->code,
+                'upload_dir' =>  $upldir,
+            ],
+        ];
+        return json_encode($ret);
+        
+    }
+
+    public function update($request){
+        $data = $request->all();
+
+        $updset = ($data['updset']);
+        $querypair = ($data['querypair']);
+
+        unset($updset['code']);
+        unset($updset['email']);// Another code to 
+
+        
+        $updvalidator = [];
+
+        foreach($updset as $key => $val){
+            if (isset($this->valset[$key])){
+                $updvalidator[$key] = $this->valset[$key];
+            }else{
+                unset($updset[$key]);
+            }
+        }
+
+        $validator = Validator::make($updset, $updvalidator);
+        if ($validator->fails()) {
+            $ret = [
+                'status' => '201',
+                'reason' => 'valerror',
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return json_encode($ret);
+        }
+        
+        try{
+            $user = ModelUser::where($querypair)->get(['code']);
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'status' => '201',
+                'reason' => $ex->getMessage(),
+                'data' => '',
+            ];
+            return json_encode($ret);
+        }
+
+        
+        
+        if (count($user) === 0){
+            $ret = [
+                'status' => '201',
+                'data' => 'User not found',
+            ];
+            return json_encode($ret);
+        }
+
+        $user = ModelUser::where($querypair)->first();
+
+        
+        foreach($updset as $key => $val){
+            $user->$key = $val;
+        }
+        
+        try{
+            $user->save();
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'response' => 'failed',
+                'reason' => $ex->getMessage(),
+                'data' => '',
+            ];
+            return json_encode($ret);
+        }
+
+        $ret = [
+            'response' => 'passed',
+            'data' => [
+                'user' => $user->code
+            ],
+        ];
+        return json_encode($ret);
+        
+    }
+
+    private function cleanArray($arr, $remove){
+
+        $ret = [];
+        $arr = array_diff($arr, $remove);
+        foreach ($arr as $vals) {
+            array_push($ret, $vals);
+        }
+        return ($ret);
+    }
+
+
+    public function fetch($request){
+        $data = $request->all();
+
+        $fetchset =  $data['fetchset'];
+        $querypair =  $data['querypair'];
+
+        $fetchset = $this->cleanArray($fetchset, ['id', 'password']);
+
+        try{
+            $model = ModelUser::select($fetchset)->where($querypair)->get();
+            $ret = [
+                'response' => '200',
+                'data' => $model,
+            ];
+            return json_encode($ret);
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'response' => '201',
+                'data' => 'Invalid query',
+            ];
+            return json_encode($ret);
+        }
+                
+    }
+    
+    public function validate($request){
+        $data = $request->all();
+
+        
+        $validator = Validator::make($data, [
+            'email' => ['required'],
+            'password' => ['required'],
+        ]);
+
+        if ($validator->fails()) {
+            $ret = [
+                'status' => '201',
+                'reason' => 'Value error',
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return json_encode($ret); 
+        }        
+               
+        
+        try{
+            $user = ModelUser::where([
+                    ['email', $data['email']], 
+                    ['password', $data['password']] 
+            ])->get(['code', 'name']);
+
+            if (isset($user[0])){
+                $user = $user[0];
+            }else{
+                $user = null;
+            }
+            
+
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'status' => '201',
+                'reason' => $ex->getMessage(),
+                'data' => 'here',
+            ];
+            return json_encode($ret);
+        }
+        
+
+        if (!isset($user)){
+            $ret = [
+                'status' => '201',
+                'data' => 'User not found',
+            ];
+            return json_encode($ret);
+        }
+
+
+        $ret = [
+            'response' => 'passed',
+            'data' => [
+                'user' =>  $user['code'],
+                'name' =>  $user['name']
+            ],
+        ];
+        return json_encode($ret);
+        
+    } 
     
     
 }

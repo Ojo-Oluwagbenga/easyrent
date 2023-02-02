@@ -16,14 +16,14 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('code');
-            $table->string('name')->default();
+            $table->string('name');
+            $table->string('price');
             $table->text('description');
-            $table->mediumText('imagepaths');//url list
-            $table->string('price')->default();
-            $table->string('type')->default();
-            $table->string('category')->default();
+            $table->string('type');
+            $table->string('category');
             $table->string('status')->default('0');
             $table->integer('likercount')->default(0);
+            $table->mediumText('imagepaths');//url list
             
             $table->timestamps();
         });

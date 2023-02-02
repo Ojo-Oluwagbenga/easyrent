@@ -36,6 +36,13 @@ Always use the request_token in the header's X-CSRF-TOKEN for all POST request.
         }
         ...
     ))
+    Example Success
+    {
+        "status":"200",
+        "data":{
+            "user":"v78Q"
+        }
+    }
 </User Create>
 
 <User Validate>
@@ -89,7 +96,7 @@ Always use the request_token in the header's X-CSRF-TOKEN for all POST request.
                 'email' "New Mail"
                 ...
             }
-            updpair:[
+            querypair:[
                 [column_name, column_value],
                 ["size", "14"],
                 ["price", "<1000"]
@@ -99,3 +106,49 @@ Always use the request_token in the header's X-CSRF-TOKEN for all POST request.
         ...
     ))
 </User Update>
+
+
+
+<Product Create>
+
+    let f_data = new FormData();
+
+    //save image in f_data in the format below
+    //Where i is the insert number of the fileObject -- starts from 1
+    form_data["file-" + i] = fileObject;
+    
+    
+    data = {
+        'name' : "product_name",
+        'price' : product_name,
+        'description' : "product_description",
+        'type' : "type",    // Can be "Dyed", "Natural_Dyed", "Undyed" etc... 
+        'category' : "category", //Can be "Shoe", "Bag", "Shirt" etc...
+    }
+
+    //Insert the product bio as described in data above as "createset"
+    fd.append('createset', JSON.stringify(data));
+
+
+    //count is the total number of images
+    fd.append('number_of_images', count);
+
+    
+    axios({
+        ...
+        url: ".../apis/product/create",
+        method: 'POST',
+        headers: {
+            "X-CSRF-TOKEN" : request_token
+        },
+        data:f_data
+        ...
+    ))
+    Example Success
+    {
+        "status":"200",
+        "data":{
+            "user":"v78Q"
+        }
+    }
+</Product Create>
