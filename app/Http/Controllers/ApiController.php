@@ -52,7 +52,7 @@ class ApiController extends Controller
         $user->name = "test1";
         $user->email = "test2@test.com";
         $user->password = "Hary";
-        $user->gender = "f";
+        $user->gender = "fEAER";
         $user->role = "user";
         $user->likedproducts = "testlikes";
 
