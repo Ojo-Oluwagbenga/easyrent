@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Event as ModelEvent;
-use App\Models\Ticket as ModelTicket;
+use App\Models\Product as ModelProduct;
+use App\Models\Bins as ModelBin;
 use App\Models\User as ModelUser;
 
 class ApiController extends Controller
@@ -47,6 +47,27 @@ class ApiController extends Controller
     }
 
     public function test(Request $request){
+        
+        $user = new ModelUser;
+        $user->name = "test1";
+        $user->email = "test2@test.com";
+        $user->password = "Hary";
+        $user->gender = "f";
+        $user->role = "user";
+        $user->likedproducts = "testlikes";
+
+        
+        try{
+            $user->save();
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'response' => 'failed',
+                'reason' => $ex->getMessage(),
+                'data' => '',
+            ];
+            return json_encode($ret);
+        }
+
         $ret = [
             'test' =>'succesful'
         ];

@@ -20,11 +20,11 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->mediumText('imagepaths');//url list
-            $table->integer('price')->default();
+            $table->integer('price');
             $table->string('type')->default();
             $table->string('category')->default();
             $table->string('status')->default('0');
-            $table->integer('proposedprice')->default('0');            
+            $table->integer('proposedprice')->default(0);            
 
         });
     }

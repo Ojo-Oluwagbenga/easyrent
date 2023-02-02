@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 // Had to configure the controller namespace at app/Providers/RouteServiceProvider.php
 
-Route::get('/apis/test', 'ApiController@test');
-// Route::get('/test', 'ApiController@test');
-Route::get('', 'ApiController@welcome');
+Route::get('/test', 'ApiController@test');
 
-Route::post('/api/{class_name}/{func_name}', 'ApiController@manager');
+
+//Vercel doesnt seem to comply well with api blablabla so I'm using /apis
+Route::post('/apis/{class_name}/{func_name}', 'ApiController@manager');
