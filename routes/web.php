@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 // Had to configure the controller namespace at app/Providers/RouteServiceProvider.php
 
 Route::get('/api/test', 'ApiController@test');
-Route::get('/test', 'ApiController@test');
+// Route::get('/test', 'ApiController@test');
 Route::get('', 'ApiController@welcome');
 
 Route::post('/api/{class_name}/{func_name}', 'ApiController@manager');
