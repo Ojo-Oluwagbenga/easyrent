@@ -468,7 +468,7 @@ class Waitlist{
         $fetchset = Util::cleanArray($fetchset, ['id', 'password']);
 
         try{
-            $model = ModelUser::select($fetchset)->get();
+            $model = ModelWaitlist::select($fetchset)->get();
             $ret = [
                 'response' => '200',
                 'data' => $model,
