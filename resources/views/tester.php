@@ -11,7 +11,7 @@
 <body>
     Hey
     <input type='file' id="up_file" name='file'>
-    <div class="init1 init" style="background-color:red">Addpost</div>
+    <div class="init1 init" style="background-color:red">Create User</div>
     <div class="init2 init" style="background-color:yellow">Addcomment</div>
     <div class="init3 init" style="background-color:green">Addreply</div>
     <div class="init4 init" style="background-color:blue">Fetch comments</div>
@@ -37,13 +37,15 @@
 
         $(".init1").click(function(){   
             data = {
-                'title' : "post_title",
-                'author_code' : "poster_code",
-                'body' : "post_texts",
+                name:"val",
+                email:"email",
+                password:"password",
+                gender:"m/f",
             }         
             axios({
                 method: 'POST',
-                url: 'https://intern-chatapp.vercel.app/apis/post/create',
+                url: 'https://tuch-delta-backend.vercel.app/apis/user/create',
+                // url: './apis/user/create',
                 headers: {
                     'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
@@ -150,7 +152,7 @@
         })
 
         $(".init6").click(function(){   
-            
+
             axios({
                     method: 'GET',
                     url: 'https://intern-chatapp.vercel.app/fetchtoken/alabi@auth.tuchdelta',
