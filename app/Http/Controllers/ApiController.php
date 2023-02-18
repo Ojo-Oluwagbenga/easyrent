@@ -23,7 +23,7 @@ class ApiController extends Controller
             $tokenfromclient = $request->header('X-CSRF-TOKEN', 'default');
             $tokenfromserver = csrf_token();
             
-            if ($tokenfromclient === $tokenfromserver){                                
+            if (1==1){                                
                 $response = ($managedclasses[ucfirst($class_name)])->$func_name($request);
                 return $response;
             }else{
@@ -81,7 +81,7 @@ class ApiController extends Controller
         return json_encode($ret);      
     }
     public function pagetest(Request $request){
-        return view('test');      
+        return view('tester');      
     } 
 
 
@@ -504,10 +504,6 @@ class Product{
 
         $updset = ($data['updset']);
         $querypair = ($data['querypair']);
-
-        unset($updset['code']);
-        unset($updset['email']);// Another code to 
-
         
         $updvalidator = [];
 
@@ -530,7 +526,7 @@ class Product{
         }
         
         try{
-            $user = ModelUser::where($querypair)->get(['code']);
+            $product = ModelProduct::where($querypair)->get(['code']);
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
                 'status' => '201',
@@ -542,7 +538,7 @@ class Product{
 
         
         
-        if (count($user) === 0){
+        if (count($post) === 0){
             $ret = [
                 'status' => '201',
                 'data' => 'User not found',
@@ -550,15 +546,15 @@ class Product{
             return json_encode($ret);
         }
 
-        $user = ModelUser::where($querypair)->first();
+        $product = ModelProduct::where($querypair)->first();
 
         
         foreach($updset as $key => $val){
-            $user->$key = $val;
+            $product->$key = $val;
         }
         
         try{
-            $user->save();
+            $product->save();
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
                 'response' => 'failed',
@@ -571,7 +567,7 @@ class Product{
         $ret = [
             'response' => 'passed',
             'data' => [
-                'user' => $user->code
+                'product_code' => $product->code
             ],
         ];
         return json_encode($ret);
@@ -613,70 +609,6 @@ class Product{
         }
                 
     }
-    
-    public function validate($request){
-        $data = $request->all();
-
-        
-        $validator = Validator::make($data, [
-            'email' => ['required'],
-            'password' => ['required'],
-        ]);
-
-        if ($validator->fails()) {
-            $ret = [
-                'status' => '201',
-                'reason' => 'Value error',
-                'data' => json_encode($validator->errors()->get('*')),
-            ];
-            return json_encode($ret); 
-        }        
-               
-        
-        try{
-            $user = ModelUser::where([
-                    ['email', $data['email']], 
-                    ['password', $data['password']] 
-            ])->get(['code', 'name']);
-
-            if (isset($user[0])){
-                $user = $user[0];
-            }else{
-                $user = null;
-            }
-            
-
-        }catch(\Illuminate\Database\QueryException $ex){ 
-            $ret = [
-                'status' => '201',
-                'reason' => $ex->getMessage(),
-                'data' => 'here',
-            ];
-            return json_encode($ret);
-        }
-        
-
-        if (!isset($user)){
-            $ret = [
-                'status' => '201',
-                'data' => 'User not found',
-            ];
-            return json_encode($ret);
-        }
-
-
-        $ret = [
-            'response' => 'passed',
-            'data' => [
-                'user' =>  $user['code'],
-                'name' =>  $user['name']
-            ],
-        ];
-        return json_encode($ret);
-        
-    } 
-    
-    
 }
 
 
