@@ -12,8 +12,8 @@
     Hey
     <input type='file' id="up_file" name='file'>
     <div class="init1 init" style="background-color:red">Create User</div>
-    <div class="init2 init" style="background-color:yellow">Addcomment</div>
-    <div class="init3 init" style="background-color:green">Addreply</div>
+    <div class="init2 init" style="background-color:yellow">Add to waitlist</div>
+    <div class="init3 init" style="background-color:green">Fetch Waiters</div>
     <div class="init4 init" style="background-color:blue">Fetch comments</div>
     <div class="init5 init" style="background-color:brown">Fetch Post 1</div>
     <div class="init6 init" style="background-color:red">Delete Post 1</div>
@@ -37,15 +37,15 @@
 
         $(".init1").click(function(){   
             data = {
-                name:"val",
-                email:"email",
+                name:"valsdss",
+                email:"email@email.com",
                 password:"password",
-                gender:"m/f",
+                gender:"m",
             }         
             axios({
                 method: 'POST',
-                url: 'https://tuch-delta-backend.vercel.app/apis/user/create',
-                // url: './apis/user/create',
+                // url: 'https://tuch-delta-backend.vercel.app/apis/user/create',
+                url: './apis/user/create',
                 headers: {
                     'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
@@ -61,14 +61,15 @@
 
         $(".init2").click(function(){   
             data = {
-                'post_code' : "v78Q",
-                'parent_address' : "base",
-                'author_code' : "author_code",
-                'text' : "Lorem4",
+                'name' : "v78Q",
+                'email' : "base@base.com",
+                'message' : "author_code",
+                'otherdata' : "-",
+                'date':"24th June 2024"
             }        
             axios({
                 method: 'POST',
-                url: 'https://intern-chatapp.vercel.app/apis/post/addcomment',
+                url: './apis/waitlist/joinwaitlist',
                 headers: {
                     'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
@@ -83,22 +84,19 @@
         })
 
         $(".init3").click(function(){   
-            data = {
-                'post_code' : "v78Q",
-                'parent_address' : "base|1",
-                'author_code' : "author_code",
-                'text' : "Lorem4",
-            }        
+                  
             axios({
                 method: 'POST',
-                url: 'https://intern-chatapp.vercel.app/apis/post/addcomment',
+                url: './apis/waitlist/fetchwaiters',
                 headers: {
                     'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
                     "BEARER-TOKEN" : "intern@omegatechnologies"
                 },     
-                data:data            
+                data:{
+                    fetchset:['name', 'email']
+                }            
             }).then(response => {
                 console.log(response);
             })

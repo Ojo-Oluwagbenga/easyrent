@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Product as ModelProduct;
 use App\Models\Bins as ModelBin;
 use App\Models\User as ModelUser;
+use App\Models\Waitlist as ModelWaitlist;
 
 class ApiController extends Controller
 {
@@ -14,7 +15,8 @@ class ApiController extends Controller
         
         $managedclasses = [
             'User' => (new User),
-            // 'Bin' => (new Bin),
+            // 'Bins' => (new Bin),
+            'Waitlist' => (new Waitlist),
             'Product' => (new Product),
         ];
        
@@ -82,9 +84,7 @@ class ApiController extends Controller
     }
     public function pagetest(Request $request){
         return view('tester');      
-    } 
-
-
+    }
     public function fetchtoken(Request $request, $apiaccesstoken){
         $ret = [
             'status'=>201,
@@ -202,6 +202,8 @@ class User{
         return json_encode($ret);
         
     }
+
+    
 
     public function update($request){
         $data = $request->all();
@@ -382,6 +384,105 @@ class User{
     
     
     
+}
+
+class Waitlist{
+    public function joinwaitlist($request){
+        $data = $request->all();       
+        
+        $validator = Validator::make($data, [
+            'name' => ['required', 'min:4', 'max:35', 'string'],
+            'email' => ['required', 'email'],
+            'message' => ['required', 'min:5', 'max:200'],
+            'date' => ['required'],
+        ]);
+
+        if ($validator->fails()) {
+            $ret = [
+                'status' => 201,
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return json_encode($ret);
+        }
+        
+        
+        $waitlist = [''];
+        try{
+            $user = ModelWaitlist::where('email', $data['email'])->get();
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'status' => 201,
+                'reason' => $ex->getMessage(),
+                'data' => '',
+            ];
+            return json_encode($ret);
+        }     
+        
+        if (count($user) !== 0){
+            $ret = [
+                'status' => 201,
+                'data' => [
+                    'email' => 'You are already on our waitlist'
+                ],
+            ];
+            return json_encode($ret);
+        }
+
+
+        $waitlist = new ModelWaitlist;
+        $waitlist->code = "Phold";
+        $waitlist->name = $data['name'];
+        $waitlist->email = $data['email'];
+        $waitlist->message = $data['message'];        
+        $waitlist->date = $data['date'];
+        $waitlist->otherdata = $data['otherdata'];
+
+        try{
+            $waitlist->save();
+
+            $waitlist->code =  Util::Encode($waitlist->id, 4, 'str');
+            $waitlist->save();
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'status' => '201',
+                'reason' => $ex->getMessage(),
+                'data' => '',
+            ];
+            return json_encode($ret);
+        }
+        
+        $ret = [
+            'status' => '200',
+            'data' => [
+                'waitlist_code' =>  $waitlist->code,
+            ],
+        ];
+        return json_encode($ret);
+        
+    }
+
+    public function fetchwaiters($request){
+        $data = $request->all();
+        $fetchset = $data['fetchset'];
+
+        $fetchset = Util::cleanArray($fetchset, ['id', 'password']);
+
+        try{
+            $model = ModelUser::select($fetchset)->get();
+            $ret = [
+                'response' => '200',
+                'data' => $model,
+            ];
+            return json_encode($ret);
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'response' => '201',
+                'data' => 'Invalid query',
+            ];
+            return json_encode($ret);
+        }
+                
+    }
 }
 
 class Product{
@@ -646,5 +747,14 @@ class Util{
             $rtl .=  substr($Res, $k, 1);
         }
         return $rtl;
+    }
+    public static  function cleanArray($arr, $remove){
+
+        $ret = [];
+        $arr = array_diff($arr, $remove);
+        foreach ($arr as $vals) {
+            array_push($ret, $vals);
+        }
+        return ($ret);
     }
 }
