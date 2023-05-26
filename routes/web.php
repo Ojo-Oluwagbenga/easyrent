@@ -19,6 +19,7 @@ Route::get('/tester', 'ApiController@pagetest');
 
 
 Route::get('/minitest', 'ApiController@minitest');
+Route::get('', 'ApiController@minitest');
 // Route::get('/test', 'ApiController@test');
 //All Apis
 
