@@ -44,8 +44,8 @@
             }         
             axios({
                 method: 'POST',
-                // url: 'https://tuch-delta-backend.vercel.app/apis/user/create',
-                url: './apis/user/create',
+                url: 'https://easyrent-zeta.vercel.app/apis/user/create',
+                // url: './apis/user/create',
                 headers: {
                     'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
