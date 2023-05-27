@@ -11,7 +11,7 @@
 <body>
     Hey
     <input type='file' id="up_file" name='file'>
-    <div class="init"></div>
+    <div class="init"></div> 
     <style>
         .init{
             width: 20px;
