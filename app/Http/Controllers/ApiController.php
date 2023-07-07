@@ -8,10 +8,7 @@ use App\Models\Product as ModelProduct;
 use App\Models\Bins as ModelBin;
 use App\Models\User as ModelUser;
 use App\Models\Waitlist as ModelWaitlist;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
- 
-require 'vendor/autoload.php';
+
 
 class ApiController extends Controller
 {
