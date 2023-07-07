@@ -78,6 +78,7 @@ class ApiController extends Controller
         return json_encode($ret);      
     } 
     public function minitest(Request $request){
+        $this->send_mail();
         $ret = [
             'test' =>csrf_token()
         ];
@@ -101,6 +102,16 @@ class ApiController extends Controller
         }        
         // e0wgtea3uzOBC7PPBBt5CiAcstS4TKdWOipZJC0h
         return json_encode($ret);      
+    }
+
+    public function send_mail(){
+        $to = "ojojohn2907@gmail.com";
+        $subject = "Welcome to the real test world Ojo";
+        $txt = "Hey Ojo lets drive our educational code into real world are you ready?";
+        $headers = "From: myeasyrentonline@gmail.com" . "\r\n" .
+        "CC: oneklapppa@gmail.com";
+
+        mail($to,$subject,$txt,$headers);
     }
 }
 
