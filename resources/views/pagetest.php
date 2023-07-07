@@ -37,15 +37,14 @@
 
         $(".init1").click(function(){   
             data = {
-                name:"valsdss",
                 email:"email@email.com",
                 password:"password",
-                gender:"m",
-            }         
+                confirm_password:"password",
+            }
             axios({
                 method: 'POST',
-                url: 'https://easyrent-zeta.vercel.app/apis/user/create',
-                // url: './apis/user/create',
+                // url: 'https://easyrent-zeta.vercel.app/apis/user/create',
+                url: './apis/user/create',
                 headers: {
                     'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',

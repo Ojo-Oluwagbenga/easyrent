@@ -1,0 +1,3 @@
+To freaking wipe all tables and all shit
+>>php artisan db:wipe
+ 

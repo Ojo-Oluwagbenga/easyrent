@@ -8,6 +8,10 @@ use App\Models\Product as ModelProduct;
 use App\Models\Bins as ModelBin;
 use App\Models\User as ModelUser;
 use App\Models\Waitlist as ModelWaitlist;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+ 
+require 'vendor/autoload.php';
 
 class ApiController extends Controller
 {
@@ -83,7 +87,7 @@ class ApiController extends Controller
         return json_encode($ret);      
     }
     public function pagetest(Request $request){
-        return view('tester');      
+        return view('pagetest');      
     }
     public function fetchtoken(Request $request, $apiaccesstoken){
         $ret = [
@@ -121,15 +125,14 @@ class User{
         $data = $request->all();       
         $data['code'] = '-';       
         $data['likedproducts'] = '[]';       
-        $data['role'] = 'm';
+        $data['role'] = '-';
+        $data['name'] = '-';
+        $data['gender'] = '-';
 
         $validator = Validator::make($data, [
-            'name' => ['required', 'min:4', 'max:35', 'string'],
             'email' => ['required', 'email'],
             'password' => ['required', 'min:5', 'max:25'],
-            'code' => ['required'],
-            'gender' => ['required'],
-            'role' => ['required'],
+            'confirm_password' => ['required'],
         ]);
 
         if ($validator->fails()) {
@@ -139,11 +142,20 @@ class User{
             ];
             return json_encode($ret);
         }
+
+        if ($data['password'] !==  $data['confirm_password']){
+            $ret = [
+                'status' => 201,
+                'message' => "The password and confirm password should match",
+                'data' => '',
+            ];
+            return json_encode($ret);
+        }
         
 
-        if ($data['email'] == 'admin@tuchdelta.com'){
-            $data['role'] = 'admin';
-        }
+        // if ($data['email'] == 'admin@tuchdelta.com'){
+        //     $data['role'] = 'admin';
+        // }
         
         
         $user = [''];
@@ -152,7 +164,7 @@ class User{
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
                 'status' => 201,
-                'reason' => $ex->getMessage(),
+                'message' => $ex->getMessage(),
                 'data' => '',
             ];
             return json_encode($ret);
@@ -161,14 +173,10 @@ class User{
         if (count($user) !== 0){
             $ret = [
                 'status' => 201,
-                'data' => [
-                    'email' => 'Email Already exists'
-                ],
+                'message'=>'Email Already exists'
             ];
             return json_encode($ret);
         }
-        
-
 
         $user = new ModelUser;
         $user->name = $data['name'];
@@ -178,12 +186,16 @@ class User{
         $user->likedproducts = $data['likedproducts'];       
         $user->role = $data['role'];
         $user->code = $data['code'];
+        $user->status = 0;
 
         try{
             $user->save();
 
             $user->code =  Util::Encode($user->id, 4, 'str');
             $user->save();
+            //Send User Mail confirm mail
+
+
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
                 'status' => '201',
@@ -195,6 +207,7 @@ class User{
         
         $ret = [
             'status' => '200',
+            'message'=> 'User successfully created',
             'data' => [
                 'user' =>  $user->code,
             ],
@@ -202,8 +215,6 @@ class User{
         return json_encode($ret);
         
     }
-
-    
 
     public function update($request){
         $data = $request->all();
@@ -293,7 +304,6 @@ class User{
         }
         return ($ret);
     }
-
 
     public function fetch($request){
         $data = $request->all();

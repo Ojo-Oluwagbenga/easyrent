@@ -17,7 +17,6 @@ url: https://easyrent-zeta.vercel.app/
     }
 </Request Token>
 
-
 <User Create>
     axios({
         ...
@@ -30,10 +29,9 @@ url: https://easyrent-zeta.vercel.app/
                     "BEARER-TOKEN" : "intern@omegatechnologies"
         },
         data:{
-            name:"val"
             email:"email"
             password:"password"
-            gender:"m/f"
+            confirm_password:"c_pass"
         }
         ...
     ))
