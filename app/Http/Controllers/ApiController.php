@@ -8,6 +8,8 @@ use App\Models\Product as ModelProduct;
 use App\Models\Bins as ModelBin;
 use App\Models\User as ModelUser;
 use App\Models\Waitlist as ModelWaitlist;
+use Mail;
+use App\Mail\MailNotify;
 
 
 class ApiController extends Controller
@@ -78,11 +80,25 @@ class ApiController extends Controller
         return json_encode($ret);      
     } 
     public function minitest(Request $request){
-        $this->send_mail();
+        $data = [
+            'subject'=>'This is the subject',
+            'body'=>'Hello this is a freaking message from me!!!'
+        ];
         $ret = [
             'test' =>csrf_token()
         ];
-        return json_encode($ret);      
+        Mail::to("ojojohn2907@gmail.com")->send(new MailNotify($data));
+        return json_encode($ret); 
+        // try {
+        //     Mail::to("ojooluwagbengajohn@gmail.com")->send(new MailNotify($data));
+        //     return json_encode($ret);   
+        // } catch (\Throwable $th) {
+        //     return json_encode([]);     
+        // }
+        // $this->send_mail();
+        
+
+        // return json_encode($ret);      
     }
     public function pagetest(Request $request){
         return view('pagetest');      
