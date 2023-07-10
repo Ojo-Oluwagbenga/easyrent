@@ -33,11 +33,13 @@
         let data = {}
 
        
- 
+        $(".init").click(function(){   
+            $(this).css("background-color",'black');
+        })
 
         $(".init1").click(function(){   
             data = {
-                email:"email@email.com",
+                email:"ojooluwagbengajohn@gmail.com",
                 password:"password",
                 confirm_password:"password",
             }

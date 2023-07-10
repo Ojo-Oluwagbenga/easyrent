@@ -120,14 +120,21 @@ class ApiController extends Controller
         return json_encode($ret);      
     }
 
-    public function send_mail(){
-        $to = "ojojohn2907@gmail.com";
-        $subject = "Welcome to the real test world Ojo";
-        $txt = "Hey Ojo lets drive our educational code into real world are you ready?";
-        $headers = "From: myeasyrentonline@gmail.com" . "\r\n" .
-        "CC: oneklapppa@gmail.com";
+    public static function send_mail($data){
+        // $data = [
+        //     'subject'=>'This is the subject',
+        //     'body'=>'Hello this is a freaking message from me!!!',
+        //     'receiver'=>'mail@receiver.com'
+        // ];
 
-        mail($to,$subject,$txt,$headers);
+        try {
+            Mail::to($data['receiver'])->send(new MailNotify($data));
+            return 'sent';
+        } catch (\Throwable $th) {
+            return 'not_sent';
+        }
+       
+
     }
 }
 
@@ -210,13 +217,23 @@ class User{
         $user->likedproducts = $data['likedproducts'];       
         $user->role = $data['role'];
         $user->code = $data['code'];
+        $user->temp_email_code = $data['code'];
         $user->status = 0;
+        $ret = 'not_sent';
 
         try{
+            
             $user->save();
 
             $user->code =  Util::Encode($user->id, 4, 'str');
+            $user->temp_email_code =  Util::Encode($user->id, 6, 'int');
             $user->save();
+            $data = [
+                'subject'=>'Mail confirmation',
+                'body'=>'Hey there. Kindly use ' . $user->temp_email_code ." to complete your sign up on ERT site",
+                'receiver'=>$data['email']
+            ];
+            $ret = ApiController::send_mail($data);
             //Send User Mail confirm mail
 
 
@@ -234,11 +251,75 @@ class User{
             'message'=> 'User successfully created',
             'data' => [
                 'user' =>  $user->code,
+                'mail_status'=> $ret
             ],
         ];
         return json_encode($ret);
         
     }
+
+    public function validate_mail($request){
+        $data = $request->all();
+
+        
+        $validator = Validator::make($data, [
+            'email' => ['required'],
+            'temp_code' => ['required'],
+        ]);
+
+        if ($validator->fails()) {
+            $ret = [
+                'status' => '201',
+                'message' => 'Value error',
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return json_encode($ret); 
+        }        
+               
+        
+        try{
+            $user = ModelUser::where([
+                    ['email', $data['email']], 
+                    ['temp_code', $data['temp_code']] 
+            ])->get(['code', 'email']);
+
+            if (isset($user[0])){
+                $user = $user[0];
+            }else{
+                $user = null;
+            }
+            
+
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'status' => '201',
+                'reason' => $ex->getMessage(),
+                'data' => 'here',
+            ];
+            return json_encode($ret);
+        }
+        
+
+        if (!isset($user)){
+            $ret = [
+                'status' => '404',
+                'message' => 'The temp code does not match the user',
+            ];
+            return json_encode($ret);
+        }
+
+
+        $ret = [
+            'response' => 'passed',
+            'data' => [
+                'user' =>  $user['code'],
+                'name' =>  $user['email']
+            ],
+        ];
+        return json_encode($ret);
+        
+    }
+    
 
     public function update($request){
         $data = $request->all();

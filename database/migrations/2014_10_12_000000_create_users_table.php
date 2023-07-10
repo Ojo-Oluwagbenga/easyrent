@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('code');
             $table->string('email')->unique();
             $table->string('password');
-            $table->integer('status')->default(0); // 0 for unverified and 1 for verified
+            $table->string('temp_email_code');// This code will be sent to the user mail for confirm
+            $table->integer('status')->default(0); // 0 for email unverified and 1 for verified
             $table->string('gender')->default("");
             $table->string('role')->default('');
             $table->integer('cashbalance')->default(0);

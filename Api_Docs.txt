@@ -26,7 +26,7 @@ url: https://easyrent-zeta.vercel.app/
             'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
-                    "BEARER-TOKEN" : "intern@omegatechnologies"
+                    "BEARER-TOKEN" : "-"
         },
         data:{
             email:"email"
@@ -44,6 +44,26 @@ url: https://easyrent-zeta.vercel.app/
     }
 </User Create>
 
+<User Email-Validate>
+    //To confirm the code sent to their mail. User can then be logged in afterward at the Validate endpoint.
+    axios({
+        ...
+        url: ".../apis/user/validate",
+        method: 'POST',
+        headers: {
+            'Access-Control-Allow-Origin':"*",
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    "BEARER-TOKEN" : "-"
+        },
+        data:{
+            email:"email"
+            temp_code:"temp_code" //This is the temp code sent to their mail
+        }
+        ...
+    ))
+</User Email-Validate>
+
 <User Validate>
     axios({
         ...
@@ -53,7 +73,7 @@ url: https://easyrent-zeta.vercel.app/
             'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
-                    "BEARER-TOKEN" : "intern@omegatechnologies"
+                    "BEARER-TOKEN" : "-"
         },
         data:{
             email:"email"
@@ -72,7 +92,7 @@ url: https://easyrent-zeta.vercel.app/
             'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
-                    "BEARER-TOKEN" : "intern@omegatechnologies"
+                    "BEARER-TOKEN" : "-"
         },
         data:{
             fetchset:['name', 'email' ...]
@@ -96,7 +116,7 @@ url: https://easyrent-zeta.vercel.app/
             'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
-                    "BEARER-TOKEN" : "intern@omegatechnologies"
+                    "BEARER-TOKEN" : "-"
         },
         data:{
             updset:{
@@ -150,7 +170,7 @@ url: https://easyrent-zeta.vercel.app/
             'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
-                    "BEARER-TOKEN" : "intern@omegatechnologies"
+                    "BEARER-TOKEN" : "-"
         },
         data:f_data
         ...
@@ -184,7 +204,7 @@ url: https://easyrent-zeta.vercel.app/
             'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
-                    "BEARER-TOKEN" : "intern@omegatechnologies"
+                    "BEARER-TOKEN" : "-"
         },
         data:data
         ...
@@ -207,7 +227,7 @@ url: https://easyrent-zeta.vercel.app/
             'Access-Control-Allow-Origin':"*",
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
-                    "BEARER-TOKEN" : "intern@omegatechnologies"
+                    "BEARER-TOKEN" : "-"
         },
         data:{
             fetchset:['name', 'email' ...]

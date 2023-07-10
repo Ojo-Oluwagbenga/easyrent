@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cdcd</title>
+    <title>Mail Body</title>
 </head>
 <body>
-    Hey Just no data at all
+    {{ $data['body'] }}
 </body>
 </html>

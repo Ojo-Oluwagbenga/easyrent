@@ -62,7 +62,7 @@ class MailNotify extends Mailable
     }
 
     public function build(){
-        return $this->from('ojojohn2907@gmail.com', 'The Ojo JOHN')
+        return $this->from('myeasyrentonline@gmail.com', "Easy Rent Online")
         ->subject($this->data['subject'])->view('emails.index')->with('data', $this->data);
     }
 }
