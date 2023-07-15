@@ -9,6 +9,7 @@ use App\Models\Bins as ModelBin;
 use App\Models\User as ModelUser;
 use App\Models\Waitlist as ModelWaitlist;
 use Mail;
+use Response;
 use App\Mail\MailNotify;
 
 
@@ -87,18 +88,11 @@ class ApiController extends Controller
         $ret = [
             'test' =>csrf_token()
         ];
-        Mail::to("ojojohn2907@gmail.com")->send(new MailNotify($data));
-        return json_encode($ret); 
-        // try {
-        //     Mail::to("ojooluwagbengajohn@gmail.com")->send(new MailNotify($data));
-        //     return json_encode($ret);   
-        // } catch (\Throwable $th) {
-        //     return json_encode([]);     
-        // }
-        // $this->send_mail();
-        
-
-        // return json_encode($ret);      
+        // Mail::to("ojojohn2907@gmail.com")->send(new MailNotify($data));
+        // return json_encode($ret); 
+        return Response::json([
+            'test' =>csrf_token()
+        ], 200); // Status code here
     }
     public function pagetest(Request $request){
         return view('pagetest');      
@@ -117,7 +111,7 @@ class ApiController extends Controller
             ];
         }        
         // e0wgtea3uzOBC7PPBBt5CiAcstS4TKdWOipZJC0h
-        return json_encode($ret);      
+        return Response::json($ret, 202);  
     }
 
     public static function send_mail($data){
@@ -171,7 +165,7 @@ class User{
                 'status' => 201,
                 'data' => json_encode($validator->errors()->get('*')),
             ];
-            return json_encode($ret);
+            return Response::json($ret, 400);
         }
 
         if ($data['password'] !==  $data['confirm_password']){
@@ -180,7 +174,7 @@ class User{
                 'message' => "The password and confirm password should match",
                 'data' => '',
             ];
-            return json_encode($ret);
+            return Response::json($ret, 400);  
         }
         
 
@@ -194,11 +188,11 @@ class User{
             $user = ModelUser::where('email', $data['email'])->get();
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
-                'status' => 201,
+                'status' => 0,
                 'message' => $ex->getMessage(),
                 'data' => '',
             ];
-            return json_encode($ret);
+            return Response::json($ret, 500); 
         }     
         
         if (count($user) !== 0){
@@ -206,7 +200,7 @@ class User{
                 'status' => 201,
                 'message'=>'Email Already exists'
             ];
-            return json_encode($ret);
+            return Response::json($ret, 400); 
         }
 
         $user = new ModelUser;
@@ -239,11 +233,11 @@ class User{
 
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
-                'status' => '201',
+                'status' => 500,
                 'reason' => $ex->getMessage(),
                 'data' => '',
             ];
-            return json_encode($ret);
+            return Response::json($ret, 200); 
         }
         
         $ret = [
@@ -254,7 +248,7 @@ class User{
                 'mail_status'=> $ret
             ],
         ];
-        return json_encode($ret);
+        return Response::json($ret, 201); 
         
     }
 
@@ -269,19 +263,20 @@ class User{
 
         if ($validator->fails()) {
             $ret = [
-                'status' => '201',
+                'status' => '400',
                 'message' => 'Value error',
                 'data' => json_encode($validator->errors()->get('*')),
             ];
-            return json_encode($ret); 
+            return Response::json($ret, 400); 
         }        
                
         
         try{
             $user = ModelUser::where([
                     ['email', $data['email']], 
-                    ['temp_code', $data['temp_code']] 
+                    ['temp_email_code', $data['temp_code']] 
             ])->get(['code', 'email']);
+
 
             if (isset($user[0])){
                 $user = $user[0];
@@ -296,27 +291,31 @@ class User{
                 'reason' => $ex->getMessage(),
                 'data' => 'here',
             ];
-            return json_encode($ret);
+            return Response::json($ret, 500); 
         }
         
 
         if (!isset($user)){
             $ret = [
                 'status' => '404',
-                'message' => 'The temp code does not match the user',
+                'message' => 'The temp code does not match the email user',
             ];
-            return json_encode($ret);
+            return Response::json($ret, 400); 
         }
 
 
+        //Update the status code
+        $user['status'] = 1;
+        $user->save(); 
         $ret = [
-            'response' => 'passed',
+            'response' => 'pass',
+            'user'=>$user,
             'data' => [
                 'user' =>  $user['code'],
-                'name' =>  $user['email']
+                'email' =>  $user['email']
             ],
         ];
-        return json_encode($ret);
+        return Response::json($ret, 202); 
         
     }
     
@@ -435,7 +434,7 @@ class User{
                 
     }
     
-    public function validate($request){
+    public function login($request){
         $data = $request->all();
 
         
@@ -450,7 +449,7 @@ class User{
                 'reason' => 'Value error',
                 'data' => json_encode($validator->errors()->get('*')),
             ];
-            return json_encode($ret); 
+            return Response::json($ret, 400); 
         }        
                
         
@@ -473,16 +472,16 @@ class User{
                 'reason' => $ex->getMessage(),
                 'data' => 'here',
             ];
-            return json_encode($ret);
+            return Response::json($ret, 500); 
         }
         
 
         if (!isset($user)){
             $ret = [
-                'status' => '201',
+                'status' => '204',
                 'data' => 'User not found',
             ];
-            return json_encode($ret);
+            return Response::json($ret, 204); 
         }
 
 
@@ -493,7 +492,7 @@ class User{
                 'name' =>  $user['name']
             ],
         ];
-        return json_encode($ret);
+        return Response::json($ret, 202); 
         
     }
     

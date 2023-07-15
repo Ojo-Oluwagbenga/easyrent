@@ -48,7 +48,7 @@ url: https://easyrent-zeta.vercel.app/
     //To confirm the code sent to their mail. User can then be logged in afterward at the Validate endpoint.
     axios({
         ...
-        url: ".../apis/user/validate",
+        url: ".../apis/user/validate_mail",
         method: 'POST',
         headers: {
             'Access-Control-Allow-Origin':"*",
@@ -64,10 +64,10 @@ url: https://easyrent-zeta.vercel.app/
     ))
 </User Email-Validate>
 
-<User Validate>
+<User login>
     axios({
         ...
-        url: ".../apis/user/validate",
+        url: ".../apis/user/login",
         method: 'POST',
         headers: {
             'Access-Control-Allow-Origin':"*",
@@ -81,7 +81,7 @@ url: https://easyrent-zeta.vercel.app/
         }
         ...
     ))
-</User Validate>
+</User login>
 
 <User Fetch>
     axios({

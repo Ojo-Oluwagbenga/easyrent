@@ -12,6 +12,7 @@
     Hey
     <input type='file' id="up_file" name='file'>
     <div class="init1 init" style="background-color:red">Create User</div>
+    <div class="init7 init" style="background-color:brown">Validate User</div>
     <div class="init2 init" style="background-color:yellow">Add to waitlist</div>
     <div class="init3 init" style="background-color:green">Fetch Waiters</div>
     <div class="init4 init" style="background-color:blue">Fetch comments</div>
@@ -60,6 +61,27 @@
                 .catch(error => console.error(error))
         })
 
+        $(".init7").click(function(){   
+            data = {
+                email:"ojooluwagbengajohn@gmail.com",
+                temp_code:"FGHIJB",
+            }
+            axios({
+                method: 'POST',
+                // url: 'https://easyrent-zeta.vercel.app/apis/user/create',
+                url: './apis/user/validate_mail',
+                headers: {
+                    'Access-Control-Allow-Origin':"*",
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                },     
+                data:data            
+            }).then(response => {
+                console.log(response);
+            })
+                .catch(error => console.error(error))
+        })
+
         $(".init2").click(function(){   
             data = {
                 'name' : "v78Q",
@@ -76,7 +98,7 @@
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
                     "BEARER-TOKEN" : "intern@omegatechnologies"
-                },     
+                },
                 data:data            
             }).then(response => {
                 console.log(response);
