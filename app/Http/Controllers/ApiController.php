@@ -181,7 +181,7 @@ class User{
 
         $validator = Validator::make($data, [
             'email' => ['required', 'email'],
-            'password' => ['required', 'min:5', 'max:25'],
+            'password' => ['required', 'min:5', 'max:25'], 
             'confirm_password' => ['required'],
         ]);
 
