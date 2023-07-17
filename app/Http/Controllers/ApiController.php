@@ -19,22 +19,29 @@ class ApiController extends Controller
         
         $managedclasses = [
             'User' => (new User),
-            // 'Bins' => (new Bin),
             'Waitlist' => (new Waitlist),
             'Product' => (new Product),
         ];
        
         try{           
             
-            $tokenfromclient = $request->header('X-CSRF-TOKEN', 'default');
-            $tokenfromserver = csrf_token();
-            
-            if (1==1){                                
+            // $tokenfromclient = $request->header('X-CSRF-TOKEN', 'default');
+            $tokenfromclient = $request->header('token', 'default');
+
+
+            $neglect = false;
+            if ($class_name == 'user'){
+                if ($func_name == 'create' || $func_name == 'login' || $func_name == 'validate_email'){
+                    $neglect = true;
+                }
+            }
+
+            if ($request->session()->get("logged_mail") == $tokenfromclient || $neglect){                                
                 $response = ($managedclasses[ucfirst($class_name)])->$func_name($request);
                 return $response;
             }else{
                 $ret = [
-                    'status' => '201',
+                    'status' => '400',
                     'reason' => 'Invalid Token',
                     'data' => 'No err',
                 ];
@@ -81,17 +88,18 @@ class ApiController extends Controller
         return json_encode($ret);      
     } 
     public function minitest(Request $request){
-        $data = [
-            'subject'=>'This is the subject',
-            'body'=>'Hello this is a freaking message from me!!!'
-        ];
-        $ret = [
-            'test' =>csrf_token()
-        ];
+        
+        // $data = [
+        //     'subject'=>'This is the subject',
+        //     'body'=>'Hello this is a freaking message from me!!!'
+        // ];
+        // $ret = [
+        //     'test' =>csrf_token()
+        // ];
         // Mail::to("ojojohn2907@gmail.com")->send(new MailNotify($data));
         // return json_encode($ret); 
         return Response::json([
-            'test' =>csrf_token()
+            'test' => Tokener::create($request, ["email"=>"The freaking"], 'logged_mail'),
         ], 200); // Status code here
     }
     public function pagetest(Request $request){
@@ -132,6 +140,20 @@ class ApiController extends Controller
     }
 }
 
+class Tokener{
+    public static function create($request, $data, $dataname){
+        $text = Util::encodeWithKey(json_encode($data), 'kafkax');
+        $request->session()->put($dataname, $text);
+        return $text;
+    }
+    public static function read($request, $data){
+        $data_text = Util::decodeWithKey($data, 'kafkax');
+        $data = json_decode($data_text, true);
+        return $data;
+    }
+
+}
+
 class User{
 
     private $valset =  [
@@ -148,7 +170,7 @@ class User{
 
     public function create($request){
         $data = $request->all();       
-        $data['code'] = '-';       
+        $data['code'] = '-';
         $data['likedproducts'] = '[]';       
         $data['role'] = '-';
         $data['name'] = '-';
@@ -176,12 +198,6 @@ class User{
             ];
             return Response::json($ret, 400);  
         }
-        
-
-        // if ($data['email'] == 'admin@tuchdelta.com'){
-        //     $data['role'] = 'admin';
-        // }
-        
         
         $user = [''];
         try{
@@ -222,12 +238,12 @@ class User{
             $user->code =  Util::Encode($user->id, 4, 'str');
             $user->temp_email_code =  Util::Encode($user->id, 6, 'int');
             $user->save();
-            $data = [
+            $mail_data = [
                 'subject'=>'Mail confirmation',
                 'body'=>'Hey there. Kindly use ' . $user->temp_email_code ." to complete your sign up on ERT site",
                 'receiver'=>$data['email']
             ];
-            $ret = ApiController::send_mail($data);
+            $ret = ApiController::send_mail($mail_data);
             //Send User Mail confirm mail
 
 
@@ -241,6 +257,7 @@ class User{
         }
         
         $ret = [
+            'token' => Tokener::create($request, ["email"=>$data['email']], 'logged_mail'),
             'status' => '200',
             'message'=> 'User successfully created',
             'data' => [
@@ -304,11 +321,9 @@ class User{
         }
 
 
-        //Update the status code
-        $user['status'] = 1;
-        $user->save(); 
+        $user->update(['status'=>1]); 
         $ret = [
-            'response' => 'pass',
+            'token' => Tokener::create($request, ["email"=>$data['email']], 'logged_mail'),
             'user'=>$user,
             'data' => [
                 'user' =>  $user['code'],
@@ -318,7 +333,6 @@ class User{
         return Response::json($ret, 202); 
         
     }
-    
 
     public function update($request){
         $data = $request->all();
@@ -481,11 +495,12 @@ class User{
                 'status' => '204',
                 'data' => 'User not found',
             ];
-            return Response::json($ret, 204); 
+            return Response::json($ret, 404);
         }
 
 
         $ret = [
+            'token' => Tokener::create($request, ["email"=>$data['email']], 'logged_mail'),
             'response' => 'passed',
             'data' => [
                 'user' =>  $user['code'],
@@ -495,8 +510,6 @@ class User{
         return Response::json($ret, 202); 
         
     }
-    
-    
     
 }
 
@@ -869,5 +882,17 @@ class Util{
             array_push($ret, $vals);
         }
         return ($ret);
+    }
+    public static function encodeWithKey($string, $key) {
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+        $encryptedString = openssl_encrypt($string, 'aes-256-cbc', $key, 0, $iv);
+        return base64_encode($iv . $encryptedString);
+    }
+    public static function decodeWithKey($encodedString, $key) {
+        $encodedString = base64_decode($encodedString);
+        $ivLength = openssl_cipher_iv_length('aes-256-cbc');
+        $iv = substr($encodedString, 0, $ivLength);
+        $encryptedString = substr($encodedString, $ivLength);
+        return openssl_decrypt($encryptedString, 'aes-256-cbc', $key, 0, $iv);
     }
 }
