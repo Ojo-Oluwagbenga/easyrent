@@ -175,6 +175,9 @@ class User{
         $data['role'] = '-';
         $data['name'] = '-';
         $data['gender'] = '-';
+        return Response::json([
+            'test' => Tokener::create($request, ["email"=>"The freaking"], 'logged_mail'),
+        ], 200);
 
         $validator = Validator::make($data, [
             'email' => ['required', 'email'],
