@@ -40,7 +40,7 @@
 
         $(".init1").click(function(){   
             data = {
-                email:"ojojohn2907@gmail.com",
+                email:"elusivejohn5@gmail.com",
                 password:"password",
                 confirm_password:"password",
             }
@@ -63,7 +63,7 @@
 
         $(".init7").click(function(){   
             data = {
-                email:"ojojohn2907@gmail.com",
+                email:"elusivejohn5@gmail.com",
                 temp_code:"FGHIJB",
             }
             axios({

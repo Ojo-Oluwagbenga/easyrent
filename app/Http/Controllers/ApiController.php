@@ -26,7 +26,7 @@ class ApiController extends Controller
         try{           
             
             // $tokenfromclient = $request->header('X-CSRF-TOKEN', 'default');
-            $tokenfromclient = $request->header('token', 'default');
+            $tokenfromclient = $request->header('Authorization', 'default');
 
 
             $neglect = false;
@@ -36,7 +36,7 @@ class ApiController extends Controller
                 }
             }
 
-            if ($request->session()->get("logged_mail") == $tokenfromclient || $neglect){                                
+            if ($request->session()->get("logged_mail") == 'Bearer '.$tokenfromclient || $neglect){                                
                 $response = ($managedclasses[ucfirst($class_name)])->$func_name($request);
                 return $response;
             }else{
@@ -221,7 +221,7 @@ class User{
 
         $user = new ModelUser;
         $user->name = $data['name'];
-        $user->email = $data['email'];
+        $user->email = $data['email']."-";
         $user->password = $data['password'];        
         $user->gender = $data['gender'];
         $user->likedproducts = $data['likedproducts'];       
