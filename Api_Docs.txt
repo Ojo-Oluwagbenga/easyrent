@@ -32,6 +32,7 @@ url: https://easyrent-zeta.vercel.app/
             email:"email"
             password:"password"
             confirm_password:"c_pass"
+            role:'landlord' // or 'user', 'management'
         }
         ...
     ))

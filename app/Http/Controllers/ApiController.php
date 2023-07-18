@@ -45,7 +45,7 @@ class ApiController extends Controller
                     'reason' => 'Invalid Token',
                     'data' => 'No err',
                 ];
-                return json_encode($ret);
+                return Response::json($ret, 400); 
             }
 
 
@@ -87,6 +87,7 @@ class ApiController extends Controller
         ];
         return json_encode($ret);      
     } 
+    
     public function minitest(Request $request){
         
         // $data = [
@@ -171,8 +172,7 @@ class User{
     public function create($request){
         $data = $request->all();       
         $data['code'] = '-';
-        $data['likedproducts'] = '[]';       
-        $data['role'] = '-';
+        $data['likedproducts'] = '[]';
         $data['name'] = '-';
         $data['gender'] = '-';
         // return Response::json([
@@ -183,6 +183,7 @@ class User{
             'email' => ['required', 'email'],
             'password' => ['required', 'min:5', 'max:25'], 
             'confirm_password' => ['required'],
+            'role' => ['required'],
         ]);
 
         if ($validator->fails()) {
