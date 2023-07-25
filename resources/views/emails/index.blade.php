@@ -6,6 +6,6 @@
     <title>Mail Body</title>
 </head>
 <body>
-    {{ $data['body'] }}
+    Hey there. Kindly use <b>{{ $data['code'] }}</b> to complete your sign up on ERT site
 </body>
 </html>

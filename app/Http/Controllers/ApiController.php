@@ -240,11 +240,11 @@ class User{
             $user->save();
 
             $user->code =  Util::Encode($user->id, 4, 'str');
-            $user->temp_email_code =  Util::Encode($user->id, 6, 'int');
+            $user->temp_email_code =  Util::Encode($user->id, 5, 'integer');
             $user->save();
             $mail_data = [
                 'subject'=>'Mail confirmation',
-                'body'=>'Hey there. Kindly use ' . $user->temp_email_code ." to complete your sign up on ERT site",
+                'code'=>$user->temp_email_code,
                 'receiver'=>$data['email']
             ];
             $ret = ApiController::send_mail($mail_data);
@@ -854,6 +854,9 @@ class Util{
         $Res = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
         if ($type == 'str'){
             $Res = 'ZgBoFklNOaJKLM5XYh12pqr6wQRSTdefijAPbcU4mnVW0stuv78xyzGCDE3HI9';
+        } 
+        if ($type == 'integer'){
+            $Res = '1234567890';
         }        
         $tlenght = strlen($Res);
         $rtl = '';
