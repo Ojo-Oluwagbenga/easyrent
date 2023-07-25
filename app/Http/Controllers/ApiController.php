@@ -486,8 +486,7 @@ class User{
 
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
-                'status' => '201',
-                'reason' => $ex->getMessage(),
+                'message' => $ex->getMessage(),
                 'data' => 'here',
             ];
             return Response::json($ret, 500); 
@@ -496,8 +495,7 @@ class User{
 
         if (!isset($user)){
             $ret = [
-                'status' => '204',
-                'data' => 'User not found',
+                'message' => 'User not found',
             ];
             return Response::json($ret, 404);
         }
