@@ -139,29 +139,6 @@ url: https://easyrent-zeta.vercel.app/
 
 
 <Product Create>
-
-    let f_data = new FormData();
-
-    //save image in f_data in the format below
-    //Where i is the insert number of the fileObject -- starts from 1
-    form_data["file-" + i] = fileObject;
-    
-    
-    data = {
-        'name' : "product_name",
-        'price' : product_name,
-        'description' : "product_description",
-        'type' : "type",    // Can be "Dyed", "Natural_Dyed", "Undyed" etc... 
-        'category' : "category", //Can be "Shoe", "Bag", "Shirt" etc...
-    }
-
-    //Insert the product bio as described in data above as "createset"
-    fd.append('createset', JSON.stringify(data));
-
-
-    //count is the total number of images
-    fd.append('number_of_images', count);
-
     
     axios({
         ...
@@ -169,11 +146,26 @@ url: https://easyrent-zeta.vercel.app/
         method: 'POST',
         headers: {
             'Access-Control-Allow-Origin':"*",
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache',
-                    "BEARER-TOKEN" : "-"
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            "BEARER-TOKEN" : "-"
         },
-        data:f_data
+        data:{
+            apartment:"The apt_name",
+            images:JSON.stringify([base64_1, base64_2, base64_3]),
+            amount:200,
+            location:"The Back of Damico Palace",
+            about:"The house is a fine place o.",
+            features:JSON.stringify([feature_1, feature_1, feature_1]),
+            main_features:JSON.stringify({
+                light:false,
+                school:false,
+                carPark:false,
+            }),
+            has_water:false,
+            has_fence:false,
+            has_electricity:false,
+        }
         ...
     ))
     Example Success
@@ -185,44 +177,10 @@ url: https://easyrent-zeta.vercel.app/
     }
 </Product Create>
 
-
-
-<Waitlist Create>
-    
-    data = {
-        'name' : "v78Q",
-        'email' : "base@base.com",
-        'message' : "author_code",
-        'otherdata' : "-",//JSON.stringify({other_needed_datas_here})
-        'date':"24th June 2024"
-    }    
-    
+<Product Fetch>
     axios({
         ...
-        url: ".../apis/product/create",
-        method: 'POST',
-        headers: {
-            'Access-Control-Allow-Origin':"*",
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache',
-                    "BEARER-TOKEN" : "-"
-        },
-        data:data
-        ...
-    ))
-    Example Success
-    {
-        "status":"200",
-        "data":{
-            "waitlist_code":"v78Q"
-        }
-    }
-</Waitlist Create>
-
-<Waitlist Fetch>
-    axios({
-        ...
-        url: ".../apis/waitlist/fetchwaiters",
+        url: ".../apis/product/fetch",
         method: 'POST',
         headers: {
             'Access-Control-Allow-Origin':"*",
@@ -231,8 +189,15 @@ url: https://easyrent-zeta.vercel.app/
                     "BEARER-TOKEN" : "-"
         },
         data:{
-            fetchset:['name', 'email' ...]
+            fetchset:['about', 'images' ...]
+            querypair:[
+                [column_name, column_value],
+                ["size", "14"],
+                ["price", "<1000"]
+                ...
+            ]
         }
         ...
     ))
-</Waitlist Fetch>
+</Product Fetch>
+

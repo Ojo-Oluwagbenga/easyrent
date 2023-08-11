@@ -516,8 +516,9 @@ class User{
 }
 
 class Waitlist{
+
     public function joinwaitlist($request){
-        $data = $request->all();       
+        $data = $request->all();      
         
         $validator = Validator::make($data, [
             'name' => ['required', 'min:4', 'max:35', 'string'],
@@ -616,7 +617,6 @@ class Waitlist{
 
 class Product{
 
-
     private $valset =  [
         'name' => ['required', 'min:4', 'max:35', 'string'],
         'price' => ['required', 'numeric', 'min:0'],
@@ -626,16 +626,16 @@ class Product{
         'category' => ['required'],
         'imagepaths' => ['required'],
     ];
-    
 
     public function create($request){
         
-        $datapack = $request->all();
-
-
-        $data = (array) json_decode($datapack['createset']);   
+        $data = $request->all();
+        
         $data['code'] = '-';
-        $data['imagepaths'] = '[]';
+        if (!isset($data['images'])){
+            $data['images'] = '[]';
+        }
+        
 
         //Other data check
         $validator = Validator::make($data, $this->valset);
@@ -648,19 +648,19 @@ class Product{
         }        
 
         // File Check
-        $updcount = $datapack['number_of_images'];
-        $fileValidator = [];
-        for ($i=0; $i < $updcount ; $i++) { 
-            $fileValidator['file-' . ($i + 1)] = 'nullable|image|mimes:jpeg,jpg,png,gif';
-        }
-        $validator = Validator::make($datapack, $fileValidator);
-        if ($validator->fails()) {
-            $ret = [
-                'status' => 201,
-                'data' => json_encode($validator->errors()->get('*')),
-            ];
-            return json_encode($ret);
-        }
+        $updcount = 0; // $datapack['number_of_images'];
+        // $fileValidator = [];
+        // for ($i=0; $i < $updcount ; $i++) { 
+        //     $fileValidator['file-' . ($i + 1)] = 'nullable|image|mimes:jpeg,jpg,png,gif';
+        // }
+        // $validator = Validator::make($datapack, $fileValidator);
+        // if ($validator->fails()) {
+        //     $ret = [
+        //         'status' => 201,
+        //         'data' => json_encode($validator->errors()->get('*')),
+        //     ];
+        //     return json_encode($ret);
+        // }
 
         
 
@@ -675,6 +675,7 @@ class Product{
             $model->save();
             $mid = $model->id;
             try {
+                //Returns Here
                 for ($i=0; $i < $updcount; $i++) {
                     $file = $request->file('file-'. ($i+1));
                     if($file) {
@@ -722,7 +723,6 @@ class Product{
             'status' => '200',
             'data' => [
                 'product_code' =>  $model->code,
-                'upload_dir' =>  $upldir,
             ],
         ];
         return json_encode($ret);
@@ -814,7 +814,6 @@ class Product{
         return ($ret);
     }
 
-
     public function fetch($request){
         $data = $request->all();
 
@@ -842,6 +841,7 @@ class Product{
 }
 
 class Util{
+
     public static function Encode($code, $encNum, $type){
         $join = '';
         for ($i = 0; $i < $encNum - strlen($code); $i++) {
@@ -865,6 +865,7 @@ class Util{
         }
         return $rtl;
     }
+
     public static function Decode($code, $encNum, $type){
         $Res = 'ZgBoFklNOaJKLM5XYh12pqr6wQRSTdefijAPbcU4mnVW0stuv78xyzGCDE3HI9';
         if ($type == 'int'){
@@ -879,7 +880,8 @@ class Util{
         }
         return $rtl;
     }
-    public static  function cleanArray($arr, $remove){
+
+    public static function cleanArray($arr, $remove){
 
         $ret = [];
         $arr = array_diff($arr, $remove);
@@ -888,11 +890,13 @@ class Util{
         }
         return ($ret);
     }
+
     public static function encodeWithKey($string, $key) {
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
         $encryptedString = openssl_encrypt($string, 'aes-256-cbc', $key, 0, $iv);
         return base64_encode($iv . $encryptedString);
     }
+
     public static function decodeWithKey($encodedString, $key) {
         $encodedString = base64_decode($encodedString);
         $ivLength = openssl_cipher_iv_length('aes-256-cbc');
