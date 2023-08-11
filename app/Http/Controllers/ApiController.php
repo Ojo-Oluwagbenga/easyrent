@@ -630,7 +630,7 @@ class Product{
     public function create($request){
         
         $data = $request->all();
-        
+
         $data['code'] = '-';
         if (!isset($data['images'])){
             $data['images'] = '[]';
@@ -644,7 +644,7 @@ class Product{
                 'status' => 201,
                 'data' => json_encode($validator->errors()->get('*')),
             ];
-            return json_encode($ret);
+            return Response::json($ret, 500);
         }        
 
         // File Check
@@ -674,6 +674,9 @@ class Product{
         try{
             $model->save();
             $mid = $model->id;
+            $model->code = Util::Encode($mid, 5, 'str');
+            $model->save();
+
             try {
                 //Returns Here
                 for ($i=0; $i < $updcount; $i++) {
@@ -712,11 +715,10 @@ class Product{
 
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
-                'status' => '201',
                 'reason' => $ex->getMessage(),
                 'data' => '',
             ];
-            return json_encode($ret);
+            return Response::json($ret, 500);
         }
         
         $ret = [
@@ -725,7 +727,7 @@ class Product{
                 'product_code' =>  $model->code,
             ],
         ];
-        return json_encode($ret);
+        return Response::json($ret, 200);
         
     }
 
@@ -820,7 +822,7 @@ class Product{
         $fetchset =  $data['fetchset'];
         $querypair =  $data['querypair'];
 
-        $fetchset = $this->cleanArray($fetchset, ['id', 'password']);
+        $fetchset = $this->cleanArray($fetchset, ['id']);
 
         try{
             $model = ModelUser::select($fetchset)->where($querypair)->get();
@@ -834,7 +836,7 @@ class Product{
                 'response' => '201',
                 'data' => 'Invalid query',
             ];
-            return json_encode($ret);
+            return Response::json($ret, 400);
         }
                 
     }
