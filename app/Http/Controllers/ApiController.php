@@ -36,7 +36,7 @@ class ApiController extends Controller
                 }
             }
 
-            if ($request->session()->get("logged_mail") == 'Bearer '.$tokenfromclient || $neglect){                                
+            if ($request->session()->get("logged_mail") == 'Bearer '.$tokenfromclient || $neglect){
                 $response = ($managedclasses[ucfirst($class_name)])->$func_name($request);
                 return $response;
             }else{
