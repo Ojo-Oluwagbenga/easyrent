@@ -333,7 +333,8 @@ class User{
         }
 
 
-        $user->update(['status'=>1]); 
+        $user->status = 1; 
+        $user->save();
         $ret = [
             'token' => Tokener::create($request, ["email"=>$data['email']], 'logged_mail'),
             'user'=>$user,
@@ -341,6 +342,7 @@ class User{
                 'user' =>  $user['code'],
                 'email' =>  $user['email']
             ],
+            "Message" => "User successfully signed in",
         ];
         return Response::json($ret, 202); 
         
