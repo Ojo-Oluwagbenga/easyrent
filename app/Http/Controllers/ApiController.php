@@ -211,7 +211,7 @@ class User{
             return Response::json($ret, 400);  
         }
         
-        $user = [''];
+        $user = [];
         try{
             $user = ModelUser::where('email', $data['email'])->get();
         }catch(\Illuminate\Database\QueryException $ex){ 
@@ -223,7 +223,7 @@ class User{
             return Response::json($ret, 500); 
         }     
         
-        if (count($user) !== 0){
+        if (isset($user[0])){
             $ret = [
                 'status' => 201,
                 'message'=>'Email Already exists'
@@ -233,7 +233,7 @@ class User{
 
         $user = new ModelUser;
         $user->name = $data['name'];
-        $user->email = $data['email']."-";
+        $user->email = $data['email'];
         $user->password = $data['password'];        
         $user->gender = $data['gender'];
         $user->likedproducts = $data['likedproducts'];       
