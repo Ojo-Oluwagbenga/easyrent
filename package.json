@@ -12,6 +12,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "vercel-php": "^0.6.0",
         "vercel-php-runtime": "^0.1.1"
     }
 }
