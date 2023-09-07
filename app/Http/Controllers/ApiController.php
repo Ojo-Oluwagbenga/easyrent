@@ -121,9 +121,9 @@ class ApiController extends Controller
     }
 
     public function danger_cleardb(Request $request){
-        User::truncate();
-        Product::truncate();
-        Bins::truncate();
+        ModelUser::truncate();
+        ModelProduct::truncate();
+        ModelBin::truncate();
         $ret = [
             'message' => "Hey Bobomi, you have cleared the DB! :)",
         ];
