@@ -26,4 +26,5 @@ Route::get('', 'ApiController@minitest');
 //Vercel doesnt seem to comply well with api blablabla so I'm using /apis
 
 Route::get('/fetchtoken/{apiaccesstoken}', 'ApiController@fetchtoken');
+Route::get('/danger_cleardb', 'ApiController@danger_cleardb');
 Route::post('/apis/{class_name}/{func_name}', 'ApiController@manager');

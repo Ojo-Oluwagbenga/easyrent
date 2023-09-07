@@ -120,6 +120,16 @@ class ApiController extends Controller
         return Response::json($ret, 200);
     }
 
+    public function danger_cleardb(Request $request){
+        User::truncate();
+        Product::truncate();
+        Bins::truncate();
+        $ret = [
+            'message' => "Hey Bobomi, you have cleared the DB! :)",
+        ];
+        return Response::json($ret, 200);
+    }
+
     public static function send_mail($data){
         // $data = [
         //     'subject'=>'This is the subject',
@@ -238,7 +248,7 @@ class User{
             $user->save();
 
             $user->code =  Util::Encode($user->id, 4, 'str');
-            $user->temp_email_code =  Util::Encode($user->id, 5, 'integer');
+            $user->temp_email_code =  Util::Encode($user->id, 4, 'integer');
             $user->save();
             $mail_data = [
                 'subject'=>'Mail confirmation',
