@@ -332,7 +332,7 @@ class User{
             return Response::json($ret, 400); 
         }
 
-
+        $user = ModelUser::where(['email'=>$data['email']])->first();
         $user->status = 1; 
         $user->save();
         $ret = [
@@ -342,6 +342,7 @@ class User{
                 'user' =>  $user['code'],
                 'email' =>  $user['email']
             ],
+            "test"=>$user,
             "Message" => "User successfully signed in",
         ];
         return Response::json($ret, 202); 
