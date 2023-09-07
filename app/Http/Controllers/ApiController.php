@@ -36,7 +36,7 @@ class ApiController extends Controller
                 }
             }
 
-            if ($request->session()->get("logged_mail") == 'Bearer '.$tokenfromclient || $neglect){
+            if ('Bearer '.$request->session()->get("logged_mail") == $tokenfromclient || $neglect){
                 $response = ($managedclasses[ucfirst($class_name)])->$func_name($request);
                 return $response;
             }else{
@@ -106,21 +106,18 @@ class ApiController extends Controller
     public function pagetest(Request $request){
         return view('pagetest');      
     }
+
     public function fetchtoken(Request $request, $apiaccesstoken){
+        if ($apiaccesstoken != "alabi@easyrent"){
+            return Response::json([
+                'Message'=>"Access Not Allowed"
+            ], 400);
+        }
+
         $ret = [
-            'status'=>201,
-            'error' => [
-                'code'=>"Invalid Api Access Code"
-            ]
+            'token' => Tokener::create($request, ["email"=>"alabi@easyrent"], 'logged_mail'),
         ];
-        if ($apiaccesstoken == "alabi@auth.tuchdelta"){
-            $ret = [
-                'status'=>201,
-                'request_token' =>csrf_token()
-            ];
-        }        
-        // e0wgtea3uzOBC7PPBBt5CiAcstS4TKdWOipZJC0h
-        return Response::json($ret, 202);  
+        return Response::json($ret, 200);
     }
 
     public static function send_mail($data){
@@ -139,6 +136,7 @@ class ApiController extends Controller
        
 
     }
+
 }
 
 class Tokener{
