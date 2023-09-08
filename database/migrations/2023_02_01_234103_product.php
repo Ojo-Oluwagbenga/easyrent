@@ -14,6 +14,7 @@ return new class extends Migration
     public function up(){
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('code');
             $table->string('apartment');
             $table->text('images');
             $table->integer('amount');
@@ -21,9 +22,9 @@ return new class extends Migration
             $table->string('about');
             $table->string('features');
             $table->string('main_features');
-            $table->boolean('has_water');
-            $table->boolean('has_fence');
-            $table->boolean('has_electricity');
+            $table->boolean('has_water'); 
+            $table->boolean('has_fence'); 
+            $table->boolean('has_electricity'); 
             $table->string('status')->default('0'); //0-queuing, 1 accepted, 2 rejected
             
             $table->timestamps();
