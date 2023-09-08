@@ -690,13 +690,10 @@ class Waitlist{
 class Product{
 
     private $valset =  [
-        'name' => ['required', 'min:4', 'max:35', 'string'],
-        'price' => ['required', 'numeric', 'min:0'],
-        'description' => ['required', 'min:5'],
+        'apartment' => ['required', 'min:4', 'max:100', 'string'],
+        'amount' => ['required', 'numeric', 'min:0'],
         'code' => ['required'],
-        'type' => ['required'],
-        'category' => ['required'],
-        'imagepaths' => ['required'],
+        'images' => ['required'],
     ];
 
     public function create($request){
