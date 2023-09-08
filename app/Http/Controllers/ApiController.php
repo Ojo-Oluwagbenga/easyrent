@@ -251,6 +251,7 @@ class User{
             $user->temp_email_code =  Util::Encode($user->id, 4, 'integer');
             $user->save();
             $mail_data = [
+                'type'=>'mail_confirm',
                 'subject'=>'Mail confirmation',
                 'code'=>$user->temp_email_code,
                 'receiver'=>$data['email']
@@ -278,6 +279,67 @@ class User{
             ],
         ];
         return Response::json($ret, 201); 
+        
+    }
+
+    public function forgot_password($request){
+        $data = $request->all();   
+
+        $validator = Validator::make($data, [
+            'email' => ['required', 'email'],
+        ]);
+
+        if ($validator->fails()) {
+            $ret = [
+                'status' => 201,
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return Response::json($ret, 400);
+        }
+
+        //Time stamp can be added later to make sure old links are not used to change password
+        $mail_data = [
+            'subject'=>'Forgot Password',
+            'link_addr'=>Util::encodeWithKey(json_encode(["user_mail"=>$data['email']]), 'Xpasspass'),
+            'receiver'=>$data['email'],
+            'type'=>'forgot_password',
+        ];
+        $ret = ApiController::send_mail($mail_data);
+
+        
+        return Response::json([
+            'status' => 201,
+            'Message' => "Reset mail successfully sent",
+        ], 201); 
+        
+    }
+
+    public function reset_password($request){
+        $data = $request->all();   
+
+        $validator = Validator::make($data, [
+            'link_code' => ['required'],
+            'new_password' => ['required'],
+        ]);
+
+        if ($validator->fails()) {
+            $ret = [
+                'status' => 201,
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return Response::json($ret, 400);
+        }
+        $linkdata = json_decode(Util::decodeWithKey($data['link_code'], 'Xpasspass'), true);
+        $user_mail = $linkdata['user_mail'];
+
+        $user = ModelUser::where(['email'=>$user_mail])->first();
+        $user->password = $data['new_password']; 
+        $user->save();
+        $ret = [
+            "Message" => "User password successfully set",
+        ];
+        return Response::json($ret, 202); 
+
         
     }
 
@@ -337,7 +399,6 @@ class User{
         $user->save();
         $ret = [
             'token' => Tokener::create($request, ["email"=>$data['email']], 'logged_mail'),
-            'user'=>$user,
             'data' => [
                 'user' =>  $user['code'],
                 'email' =>  $user['email']

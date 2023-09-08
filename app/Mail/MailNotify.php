@@ -62,7 +62,13 @@ class MailNotify extends Mailable
     }
 
     public function build(){
-        return $this->from('myeasyrentonline@gmail.com', "Easy Rent Online")
-        ->subject($this->data['subject'])->view('emails.index')->with('data', $this->data);
+        if ($this->data['type'] == 'mail_confirm'){
+            return $this->from('myeasyrentonline@gmail.com', "Easy Rent Online")
+            ->subject($this->data['subject'])->view('emails.index')->with('data', $this->data);
+        }
+        if ($this->data['type'] == 'forgot_password'){
+            return $this->from('myeasyrentonline@gmail.com', "Easy Rent Online")
+            ->subject($this->data['subject'])->view('emails.forgotpassword')->with('data', $this->data);
+        }
     }
 }
