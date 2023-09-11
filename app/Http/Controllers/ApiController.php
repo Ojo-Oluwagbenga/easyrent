@@ -44,6 +44,8 @@ class ApiController extends Controller
                     'status' => '400',
                     'reason' => 'Invalid Token',
                     'data' => 'No err',
+                    'your_token' =>$tokenfromclient,
+                    'server_token' =>'Bearer '.$request->session()->get("logged_mail"),
                 ];
                 return Response::json($ret, 400); 
             }
