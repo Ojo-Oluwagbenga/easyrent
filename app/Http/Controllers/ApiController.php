@@ -274,6 +274,7 @@ class User{
         $ret = [
             'token' => Tokener::create($request, ["email"=>$data['email']], 'logged_mail'),
             'status' => '200',
+            'otp' =>$user->temp_email_code,
             'message'=> 'User successfully created',
             'data' => [
                 'user' =>  $user->code,
