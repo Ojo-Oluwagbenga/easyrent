@@ -31,7 +31,7 @@ class ApiController extends Controller
 
             $neglect = false;
             if ($class_name == 'user'){
-                if ($func_name == 'create' || $func_name == 'login' || $func_name == 'validate_email'){
+                if ($func_name == 'create' || $func_name == 'forgot_password' || $func_name == 'reset_password' || $func_name == 'login' || $func_name == 'validate_email'){
                     $neglect = true;
                 }
             }
