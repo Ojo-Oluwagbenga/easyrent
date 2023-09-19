@@ -214,6 +214,7 @@ class User{
         $data['likedproducts'] = '[]';
         $data['name'] = '-';
         $data['gender'] = '-';
+        $data['profile_picture'] = '-';
         // return Response::json([
         //     'test' => Tokener::create($request, ["email"=>"The freaking"], 'logged_mail'),
         // ], 200);
