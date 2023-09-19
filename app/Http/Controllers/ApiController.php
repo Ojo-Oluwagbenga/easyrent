@@ -29,15 +29,15 @@ class ApiController extends Controller
             $tokenfromclient = $request->header('Authorization', 'default');
 
 
-            $neglect = false;
+            $stat = (Tokener::read($tokenfromclient) != false);
             if ($class_name == 'user'){
                 if ($func_name == 'create' || $func_name == 'forgot_password' || $func_name == 'reset_password' || $func_name == 'login' || $func_name == 'validate_email'){
-                    $neglect = true;
+                    $stat = true;
                 }
             }
-            $neglect = true;
+            
 
-            if ('Bearer '.$request->session()->get("logged_mail") == $tokenfromclient || $neglect){
+            if ($stat){
                 $response = ($managedclasses[ucfirst($class_name)])->$func_name($request);
                 return $response;
             }else{
@@ -45,8 +45,6 @@ class ApiController extends Controller
                     'status' => '400',
                     'reason' => 'Invalid Token',
                     'data' => 'No err',
-                    'your_token' =>$tokenfromclient,
-                    'server_token' =>'Bearer '.$request->session()->get("logged_mail"),
                 ];
                 return Response::json($ret, 400); 
             }
@@ -155,14 +153,38 @@ class ApiController extends Controller
 class Tokener{
     public static function create($request, $data, $dataname){
         $text = Util::encodeWithKey(json_encode($data), 'kafkax');
-        $request->session()->put($dataname, $text);
+        // $request->session()->put($dataname, $text);
         return $text;
     }
     public static function read($request, $data){
         $data_text = Util::decodeWithKey($data, 'kafkax');
         $data = json_decode($data_text, true);
-        return $data;
+
+        try {
+            $ret = $data['email'];
+            return $ret;
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
+    public static function getuser($request){
+        $tokenfromclient = $request->header('Authorization', 'default');
+        if ($tokenfromclient == 'default'){
+            return false;
+        }
+
+        $data_text = Util::decodeWithKey($tokenfromclient, 'kafkax');
+        $data = json_decode($data_text, true);
+
+        try {
+            $ret = $data['email'];
+            return $ret;
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
+
 
 }
 
@@ -411,6 +433,49 @@ class User{
             "Message" => "User successfully signed in",
         ];
         return Response::json($ret, 202); 
+        
+    }
+
+    public function upload_dp($request){
+        $data = $request->all();
+
+        $ret = [
+            "Message" => "Invalid token has been sent!",
+        ];
+
+        
+        $validator = Validator::make($data, [
+            'b64_dp' => ['required'],
+        ]);
+
+        if ($validator->fails()) {
+            $ret = [
+                'status' => '400',
+                'message' => 'Value error',
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return Response::json($ret, 400); 
+        }        
+               
+        $useremail = Tokener::getuser($request);
+        if (!$useremail){
+            return Response::json($ret, 400); 
+        }
+
+        try {
+            $user = ModelUser::where(['email'=>$useremail])->first();
+            $user->profile_picture = $data['b64_dp']; 
+            $user->save();
+            $ret = [
+                "Message" => "Profile picture successfully updated",
+            ];
+            return Response::json($ret, 202); 
+        } catch (\Throwable $th) {
+            $ret = [
+                "Message" => "Unable to find user",
+            ];
+            return Response::json($ret, 400); 
+        }        
         
     }
 

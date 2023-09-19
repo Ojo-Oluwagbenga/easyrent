@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('role')->default('');
             $table->integer('cashbalance')->default(0);
             $table->mediumText('likedproducts'); // ['stringlist of product id']
-            
+            $table->mediumText('profile_picture');
             //medium Text dont have default values;
             //Seems this guy is damn important too lol
             $table->timestamps();
