@@ -29,7 +29,7 @@ class ApiController extends Controller
             $tokenfromclient = $request->header('Authorization', 'default');
 
 
-            $stat = (Tokener::read($tokenfromclient) != false);
+            $stat = (Tokener::getuser($request) != false);
             if ($class_name == 'user'){
                 if ($func_name == 'create' || $func_name == 'forgot_password' || $func_name == 'reset_password' || $func_name == 'login' || $func_name == 'validate_email'){
                     $stat = true;
@@ -43,7 +43,7 @@ class ApiController extends Controller
             }else{
                 $ret = [
                     'status' => '400',
-                    'reason' => 'Invalid Token',
+                    'reason' => 'Invalid Token Recieved',
                     'data' => 'No err',
                 ];
                 return Response::json($ret, 400); 
@@ -156,7 +156,7 @@ class Tokener{
         // $request->session()->put($dataname, $text);
         return $text;
     }
-    public static function read($request, $data){
+    public static function read($data){
         $data_text = Util::decodeWithKey($data, 'kafkax');
         $data = json_decode($data_text, true);
 
@@ -169,11 +169,17 @@ class Tokener{
     }
     public static function getuser($request){
         $tokenfromclient = $request->header('Authorization', 'default');
+        
         if ($tokenfromclient == 'default'){
             return false;
         }
+        $tarr = explode(" ", $tokenfromclient);
+        if (!isset($tarr[1])){
+            return false;
+        }
+        $ctext = $tarr[1];
 
-        $data_text = Util::decodeWithKey($tokenfromclient, 'kafkax');
+        $data_text = Util::decodeWithKey($ctext, 'kafkax');
         $data = json_decode($data_text, true);
 
         try {
