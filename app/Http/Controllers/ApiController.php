@@ -273,6 +273,7 @@ class User{
         $user->code = $data['code'];
         $user->temp_email_code = $data['code'];
         $user->status = 0;
+        $user->profile_picture = $data['profile_picture'];
         $ret = 'not_sent';
 
         try{
