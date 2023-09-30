@@ -556,7 +556,7 @@ class User{
             return Response::json($ret, 202); 
         } catch (\Throwable $th) {
             $ret = [
-                "Message" => "Unable to find user",
+                "Message" => "Unable to find user with the provided token",
             ];
             return Response::json($ret, 400); 
         }        
