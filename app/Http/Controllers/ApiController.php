@@ -331,10 +331,28 @@ class User{
             return Response::json($ret, 400);
         }
 
+        
+        try {
+            $user = ModelUser::where(['email'=>$useremail])->first();
+            if (!isset($user)){
+                $ret = [
+                    'status' => 201,
+                    'data' => "sent",
+                ];
+                return Response::json($ret, 400);
+            }
+        } catch (\Throwable $th) {
+            $ret = [
+                "Message" => "sent",
+            ];
+            return Response::json($ret, 200); 
+        }        
+        
+
         //Time stamp can be added later to make sure old links are not used to change password
         $mail_data = [
             'subject'=>'Forgot Password',
-            'link_addr'=>Util::encodeWithKey(json_encode(["user_mail"=>$data['email']]), 'Xpasspass'),
+            'link_addr'=>Util::encodeWithKey(json_encode(["user_mail"=>$data['email'], "time"=>mktime()]), 'Xpasspass'),
             'receiver'=>$data['email'],
             'type'=>'forgot_password',
         ];
@@ -364,7 +382,14 @@ class User{
             return Response::json($ret, 400);
         }
         $linkdata = json_decode(Util::decodeWithKey($data['link_code'], 'Xpasspass'), true);
+
+        $time = $linkdata['time'];
+        //Check if time is under 10mins
+
+
         $user_mail = $linkdata['user_mail'];
+
+
 
         $user = ModelUser::where(['email'=>$user_mail])->first();
         $user->password = $data['new_password']; 
@@ -476,6 +501,57 @@ class User{
             $user->save();
             $ret = [
                 "Message" => "Profile picture successfully updated",
+            ];
+            return Response::json($ret, 202); 
+        } catch (\Throwable $th) {
+            $ret = [
+                "Message" => "Unable to find user",
+            ];
+            return Response::json($ret, 400); 
+        }        
+        
+    }
+
+    public function update_account($request){
+        $data = $request->all();
+
+        $ret = [
+            "Message" => "Invalid token has been sent!",
+        ];
+
+        
+        $validator = Validator::make($data, [
+            'bank_name' => ['required'],
+            'account_name' => ['required'],
+            'account_number' => ['required'],
+        ]);
+
+        if ($validator->fails()) {
+            $ret = [
+                'status' => '400',
+                'message' => 'Value error',
+                'data' => json_encode($validator->errors()->get('*')),
+            ];
+            return Response::json($ret, 400); 
+        }        
+               
+        $useremail = Tokener::getuser($request);
+        if (!$useremail){
+            return Response::json($ret, 400); 
+        }
+
+        $upd_data = array(
+            "bank_name"=>$data['bank_name'],
+            "account_name"=>$data['account_name'],
+            "account_number"=>$data['account_number'],
+        );
+
+        try {
+            $user = ModelUser::where(['email'=>$useremail])->first();
+            $user->account_details = json_encode($upd_data);
+            $user->save();
+            $ret = [
+                "Message" => "Account details successfully updated",
             ];
             return Response::json($ret, 202); 
         } catch (\Throwable $th) {
