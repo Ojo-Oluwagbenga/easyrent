@@ -1085,7 +1085,7 @@ class Product{
 
 
         try{
-            $model = ModelUser::select($fetchset)->where($querypair)->get();
+            $model = ModelProduct::select($fetchset)->where($querypair)->get();
             $ret = [
                 'response' => '200',
                 'data' => $model,
