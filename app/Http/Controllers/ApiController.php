@@ -658,6 +658,13 @@ class User{
         $fetchset =  $data['fetchset'];
         $querypair =  $data['querypair'];
 
+        $useremail = Tokener::getuser($request);
+        if (!$useremail){
+            return Response::json($ret, 400); 
+        }
+        $querypair['email'] = $useremail;
+
+
         $fetchset = $this->cleanArray($fetchset, ['id', 'password']);
 
         try{
@@ -857,7 +864,21 @@ class Product{
         if (!isset($data['images'])){
             $data['images'] = '[]';
         }
+
+        $useremail = Tokener::getuser($request);
+        if (!$useremail){
+            return Response::json($ret, 400); 
+        }
         
+        $user = ModelUser::where(['email'=>$useremail])->first();
+        if (!isset($user)){
+            $ret = [
+                'status' => 400,
+                'Message' => "Invalid Token Sent!",
+            ];
+            return Response::json($ret, 400);
+        }
+        $data['creator_code'] = $user->code;
 
         //Other data check
         $validator = Validator::make($data, $this->valset);
@@ -867,7 +888,7 @@ class Product{
                 'data' => json_encode($validator->errors()->get('*')),
             ];
             return Response::json($ret, 500);
-        }        
+        }
 
         // File Check
         $updcount = 0; // $datapack['number_of_images'];
@@ -1045,6 +1066,23 @@ class Product{
         $querypair =  $data['querypair'];
 
         $fetchset = $this->cleanArray($fetchset, ['id']);
+
+        $useremail = Tokener::getuser($request);
+        if (!$useremail){
+            return Response::json($ret, 400); 
+        }
+        
+        $user = ModelUser::where(['email'=>$useremail])->first();
+        if (!isset($user)){
+            $ret = [
+                'status' => 400,
+                'Message' => "Invalid Token Sent!",
+            ];
+            return Response::json($ret, 400);
+        }
+        $querypair['creator_code'] = $user->code;
+
+
 
         try{
             $model = ModelUser::select($fetchset)->where($querypair)->get();
