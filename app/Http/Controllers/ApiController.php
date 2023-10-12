@@ -707,7 +707,7 @@ class User{
             $user = ModelUser::where([
                     ['email', $data['email']], 
                     ['password', $data['password']] 
-            ])->get(['code', 'name']);
+            ])->get();
 
             if (isset($user[0])){
                 $user = $user[0];
@@ -732,13 +732,13 @@ class User{
             return Response::json($ret, 404);
         }
 
-
+        $user['password'] = '-';
+        $user['id'] = '-';
         $ret = [
             'token' => Tokener::create($request, ["email"=>$data['email']], 'logged_mail'),
             'response' => 'passed',
             'data' => [
-                'user' =>  $user['code'],
-                'name' =>  $user['name']
+                'user' =>  $user,
             ],
         ];
         return Response::json($ret, 202); 
