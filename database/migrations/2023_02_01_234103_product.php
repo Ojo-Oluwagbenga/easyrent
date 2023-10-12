@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('code');
             $table->string('creator_code');
+            $table->string('product_code');
             $table->string('apartment');
             $table->text('images');
             $table->integer('amount');

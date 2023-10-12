@@ -847,7 +847,7 @@ class Waitlist{
     }
 }
 
-class Product{
+class Product extends Controller{
 
     private $valset =  [
         'apartment' => ['required', 'min:4', 'max:100', 'string'],
