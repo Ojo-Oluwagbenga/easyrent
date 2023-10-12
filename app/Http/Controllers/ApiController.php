@@ -859,6 +859,10 @@ class Product{
     public function create($request){
         
         $data = $request->all();
+        $ret = [
+            'status' => 400,
+            'Message' => "Invalid Token Sent!",
+        ];
 
         $data['code'] = '-';
         if (!isset($data['images'])){
@@ -872,10 +876,6 @@ class Product{
         
         $user = ModelUser::where(['email'=>$useremail])->first();
         if (!isset($user)){
-            $ret = [
-                'status' => 400,
-                'Message' => "Invalid Token Sent!",
-            ];
             return Response::json($ret, 400);
         }
         $data['creator_code'] = $user->code;
@@ -1086,6 +1086,59 @@ class Product{
 
         try{
             $model = ModelProduct::select($fetchset)->where($querypair)->get();
+            $ret = [
+                'response' => '200',
+                'data' => $model,
+            ];
+            return json_encode($ret);
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'response' => '201',
+                'data' => 'Invalid query',
+            ];
+            return Response::json($ret, 400);
+        }
+                
+    }
+    public function fetchmyproducts($request){
+        $useremail = Tokener::getuser($request);
+        if (!$useremail){
+            return Response::json($ret, 400); 
+        }
+        
+        $user = ModelUser::where(['email'=>$useremail])->first();
+        if (!isset($user)){
+            $ret = [
+                'status' => 400,
+                'Message' => "Invalid Token Sent!",
+            ];
+            return Response::json($ret, 400);
+        }
+        $querypair['creator_code'] = $user->code;
+
+
+
+        try{
+            $model = ModelProduct::select()->where($querypair)->get();
+            $ret = [
+                'response' => '200',
+                'data' => $model,
+            ];
+            return json_encode($ret);
+        }catch(\Illuminate\Database\QueryException $ex){ 
+            $ret = [
+                'response' => '201',
+                'data' => 'Invalid query',
+            ];
+            return Response::json($ret, 400);
+        }
+                
+    }
+    public function fetchallproducts($request){
+        
+
+        try{
+            $model = ModelProduct::select()->get();
             $ret = [
                 'response' => '200',
                 'data' => $model,

@@ -28,3 +28,7 @@ Route::get('', 'ApiController@minitest');
 Route::get('/fetchtoken/{apiaccesstoken}', 'ApiController@fetchtoken');
 Route::get('/danger_cleardb', 'ApiController@danger_cleardb');
 Route::post('/apis/{class_name}/{func_name}', 'ApiController@manager');
+
+// PRODUCTS
+Route::get('/apis/product/me', 'Product@fetchmyproducts');
+Route::get('/apis/product/fetchall', 'Product@fetchmyproducts');
