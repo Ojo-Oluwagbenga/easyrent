@@ -1095,6 +1095,7 @@ class Product{
             $ret = [
                 'response' => '201',
                 'data' => 'Invalid query',
+                'ex'=> $ex->getMessage(),
             ];
             return Response::json($ret, 400);
         }
