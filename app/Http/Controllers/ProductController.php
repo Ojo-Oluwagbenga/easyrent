@@ -311,7 +311,7 @@ class ProductController extends Controller{
         }
                 
     }
-    public function fetchmyproducts(Request $request, $r, $r2){
+    public function fetchmyproducts(Request $request){
         $useremail = Tokener::getuser($request);
         if (!$useremail){
             return Response::json($ret, 400); 
@@ -345,7 +345,7 @@ class ProductController extends Controller{
         }
                 
     }
-    public function fetchallproducts(Request $request, $r, $r2){
+    public function fetchallproducts(Request $request){
         
 
         try{
