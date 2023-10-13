@@ -864,7 +864,7 @@ class Product extends Controller{
             'Message' => "Invalid Token Sent!",
         ];
 
-        $data['code'] = '-';
+        $data['product_code'] = '-';
         if (!isset($data['images'])){
             $data['images'] = '[]';
         }
@@ -917,7 +917,7 @@ class Product extends Controller{
         try{
             $model->save();
             $mid = $model->id;
-            $model->code = Util::Encode($mid, 5, 'str');
+            $model->product_code = Util::Encode($mid, 5, 'str');
             $model->save();
 
             try {
@@ -967,7 +967,7 @@ class Product extends Controller{
         $ret = [
             'status' => '200',
             'data' => [
-                'product_code' =>  $model->code,
+                'product_code' =>  $model->product_code,
             ],
         ];
         return Response::json($ret, 200);
@@ -1001,7 +1001,7 @@ class Product extends Controller{
         }
         
         try{
-            $product = ModelProduct::where($querypair)->get(['code']);
+            $product = ModelProduct::where($querypair)->get(['product_code']);
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
                 'status' => '201',
@@ -1042,7 +1042,7 @@ class Product extends Controller{
         $ret = [
             'response' => 'passed',
             'data' => [
-                'product_code' => $product->code
+                'product_code' => $product->product_code
             ],
         ];
         return json_encode($ret);
