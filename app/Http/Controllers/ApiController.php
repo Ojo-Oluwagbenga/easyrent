@@ -852,7 +852,7 @@ class Product extends Controller{
     private $valset =  [
         'apartment' => ['required', 'min:4', 'max:100', 'string'],
         'amount' => ['required', 'numeric', 'min:0'],
-        'code' => ['required'],
+        'product_code' => ['required'],
         'images' => ['required'],
     ];
 
