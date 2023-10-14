@@ -1087,13 +1087,11 @@ class Product extends Controller{
         try{
             $model = ModelProduct::select($fetchset)->where($querypair)->get();
             $ret = [
-                'response' => '200',
                 'data' => $model,
             ];
             return json_encode($ret);
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
-                'response' => '201',
                 'data' => 'Invalid query',
                 'ex'=> $ex->getMessage(),
             ];
@@ -1122,10 +1120,9 @@ class Product extends Controller{
         try{
             $model = ModelProduct::select()->where($querypair)->get();
             $ret = [
-                'response' => '200',
                 'data' => $model,
             ];
-            return json_encode($ret);
+            return Response::json($ret, 200);
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
                 'response' => '201',
@@ -1141,13 +1138,11 @@ class Product extends Controller{
         try{
             $model = ModelProduct::select()->get();
             $ret = [
-                'response' => '200',
                 'data' => $model,
             ];
-            return json_encode($ret);
+            return Response::json($ret, 200);
         }catch(\Illuminate\Database\QueryException $ex){ 
             $ret = [
-                'response' => '201',
                 'data' => 'Invalid query',
             ];
             return Response::json($ret, 400);
