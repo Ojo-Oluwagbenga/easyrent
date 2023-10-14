@@ -863,7 +863,9 @@ class Product extends Controller{
             'status' => 400,
             'Message' => "Invalid Token Sent!",
         ];
-
+        $data['has_water'] = '-';
+        $data['has_fence'] = '-';
+        $data['has_electricity'] = '-';
         $data['product_code'] = '-';
         if (!isset($data['images'])){
             $data['images'] = '[]';
